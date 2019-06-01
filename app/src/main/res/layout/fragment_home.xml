@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <!--banner-->
+        <android.support.v4.view.ViewPager
+            android:id="@+id/banner"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_192"></android.support.v4.view.ViewPager>
+        <!--项目状态-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_69"
+            android:background="@android:color/white"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:id="@+id/project_cate0"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/project_count0"
+                    style="@style/HomeToolsShape"
+                    android:background="@drawable/home_shape_intention" />
+
+                <TextView
+                    style="@style/HomeToolsText"
+                    android:layout_below="@+id/project_count0"
+                    android:text="意向"
+                    android:textColor="@color/homeIntention" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/project_cate1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/project_count1"
+                    style="@style/HomeToolsShape"
+                    android:background="@drawable/home_shape_underway" />
+
+                <TextView
+                    style="@style/HomeToolsText"
+                    android:layout_below="@+id/project_count1"
+                    android:text="进行中"
+                    android:textColor="@color/homeUnderway" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/project_cate2"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/project_count2"
+                    style="@style/HomeToolsShape"
+                    android:background="@drawable/home_shape_extension" />
+
+                <TextView
+                    style="@style/HomeToolsText"
+                    android:layout_below="@+id/project_count2"
+                    android:text="延期"
+                    android:textColor="@color/homeExtension" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/project_cate3"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/project_count3"
+                    style="@style/HomeToolsShape"
+                    android:background="@drawable/home_shape_done" />
+
+                <TextView
+                    style="@style/HomeToolsText"
+                    android:layout_below="@+id/project_count3"
+                    android:text="已完成"
+                    android:textColor="@color/homeDone" />
+            </RelativeLayout>
+        </LinearLayout>
+        <!--项目列表-->
+        <ExpandableListView
+            android:id="@+id/project_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:childDivider="@null"
+            android:divider="@null"
+            android:paddingLeft="@dimen/dp_12"
+            android:paddingRight="@dimen/dp_12"
+            android:scrollbars="none"></ExpandableListView>
+    </LinearLayout>
+    <!--按钮-->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="@dimen/dp_12"
+        android:layout_marginBottom="@dimen/dp_20"
+        android:orientation="vertical">
+
+        <ImageButton
+            android:id="@+id/create_project"
+            android:layout_width="@dimen/dp_40"
+            android:layout_height="@dimen/dp_40"
+            android:background="@android:color/transparent"
+            android:scaleType="fitXY"
+            android:src="@drawable/icon_add" />
+    </LinearLayout>
+
+</RelativeLayout>

@@ -8,7 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 
-import com.huiketong.jiketong.utils.ProgressDialog;
+import com.huiketong.guanjiatong.utils.ProgressDialog;
 
 /**
  * 基础Acitivty

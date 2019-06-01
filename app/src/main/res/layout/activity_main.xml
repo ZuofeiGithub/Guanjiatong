@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootview"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.MainActivity">
+
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_above="@+id/radioGroup"></FrameLayout>
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_55"
+        android:background="@drawable/shape_tabbar_top_line"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_alignParentBottom="true">
+
+        <RadioButton
+            android:id="@+id/rb_home"
+            style="@style/Tabbar"
+            android:drawableTop="@drawable/selector_tabbar_home"
+            android:text="首页" />
+
+        <RadioButton
+            android:id="@+id/rb_client"
+            style="@style/Tabbar"
+            android:drawableTop="@drawable/selector_tabbar_client"
+            android:text="报备客户" />
+
+        <RadioButton
+            android:id="@+id/rb_my"
+            style="@style/Tabbar"
+            android:drawableTop="@drawable/selector_tabbar_my"
+            android:text="我的" />
+
+    </RadioGroup>
+</RelativeLayout>

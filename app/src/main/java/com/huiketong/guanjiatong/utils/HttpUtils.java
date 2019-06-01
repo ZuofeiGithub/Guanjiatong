@@ -7,6 +7,8 @@ import android.os.Looper;
 
 import com.google.gson.JsonObject;
 
+import org.apache.commons.text.StringEscapeUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -72,7 +74,7 @@ public class HttpUtils {
      * @param params   请求参数
      * @param callback 请求回调
      */
-    private void inner_postFormRequest(String url, Map<String, String> params, HttpCallback callback) {
+    private void inner_postFormRequest(String url, Map<String, String> params, final HttpCallback callback) {
         RequestBody requestBody;
         if (params == null) {
             params = new HashMap<>();
@@ -231,7 +233,7 @@ public class HttpUtils {
      * @param files    图片文件
      * @param callback 回调函数
      */
-    private void inner_sendImageForm(String url, Map<String, String> params,String fileName, List<File> files, HttpCallback callback) {
+    private void inner_sendImageForm(String url, Map<String, String> params, String fileName, List<File> files, final HttpCallback callback) {
         MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder();
         multipartBodyBuilder.setType(MultipartBody.FORM);
         //遍历map中所有参数到builder
@@ -252,7 +254,7 @@ public class HttpUtils {
         Request.Builder RequestBuilder = new Request.Builder();
         RequestBuilder.url(url);// 添加URL地址
         RequestBuilder.post(requestBody);
-        Request request = RequestBuilder.build();
+        final Request request = RequestBuilder.build();
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -343,5 +345,15 @@ public class HttpUtils {
 
     public static void setContext(Context context) {
         getInstance().context = context;
+    }
+
+    /**
+     * 获取json数据
+     * @param str
+     * @return
+     */
+    public static String getJson(String str){
+        str = StringEscapeUtils.unescapeJson(str);
+        return str.replace("\"{","{").replace("}\"","}");
     }
 }

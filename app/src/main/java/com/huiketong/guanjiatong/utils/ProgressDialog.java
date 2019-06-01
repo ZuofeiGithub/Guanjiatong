@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
-import com.huiketong.jiketong.R;
+import com.huiketong.guanjiatong.R;
 
 /**
  * 进度对话框

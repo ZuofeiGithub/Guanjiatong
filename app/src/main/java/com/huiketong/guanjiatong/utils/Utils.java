@@ -15,7 +15,7 @@ import android.widget.Toast;
 
 import com.bigkoo.pickerview.builder.OptionsPickerBuilder;
 import com.bigkoo.pickerview.listener.OnOptionsSelectListener;
-import com.huiketong.jiketong.R;
+import com.huiketong.guanjiatong.R;
 import com.orhanobut.logger.Logger;
 
 import java.io.BufferedReader;
@@ -26,16 +26,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.MappedByteBuffer;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 工具类
  */
 public class Utils {
-    // 基础url
-    public static String baseUrl = "http://jkt365.com";
-    // api url
-    public static String apiUrl = baseUrl + "/api/";
     // 存储文件名
     private static String SHARED_FILE_NAME = "shared";
     static Toast toast = null;
@@ -90,6 +90,38 @@ public class Utils {
         editor.apply();
     }
 
+    /**设置存储信息
+     *
+     * @param context
+     * @param share
+     */
+    public static void setShared(Context context, Map<String,Object> share) {
+        SharedPreferences sp = context.getSharedPreferences(SHARED_FILE_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        Object value;
+        String name;
+        Set<String> keys = share.keySet();
+        for (String key : keys){
+            value = share.get(key);
+            name = value.getClass().getSimpleName();
+            switch (name) {
+                case "String":
+                    editor.putString(key, (String) value);
+                    break;
+                case "Float":
+                    editor.putFloat(key, (Float) value);
+                    break;
+                case "Integer":
+                    editor.putInt(key, (Integer) value);
+                    break;
+                case "Long":
+                    editor.putLong(key, (Long) value);
+                    break;
+            }
+        }
+        editor.apply();
+    }
+
     /**
      * 获取存储参数
      *
@@ -118,9 +150,10 @@ public class Utils {
 
     /**
      * 清除所有存储数据
+     *
      * @param context
      */
-    public static void clearShare(Context context){
+    public static void clearShare(Context context) {
         SharedPreferences sp = context.getSharedPreferences(SHARED_FILE_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         editor.clear();
@@ -186,12 +219,13 @@ public class Utils {
 
     /**
      * 银行卡号加星号处理
+     *
      * @param bankCard
      * @return
      */
     public static String bankCardFormat(String bankCard) {
         int showCount = bankCard.length() % 4;
-        if(showCount == 0){
+        if (showCount == 0) {
             showCount = 4;
         }
         int starCount = bankCard.length() - showCount;
@@ -199,7 +233,7 @@ public class Utils {
         String star = "";
         for (int i = 1; i <= starCount; i++) {
             star += "*";
-            if(i%4 == 0){
+            if (i % 4 == 0) {
                 star += " ";
             }
         }
@@ -208,11 +242,12 @@ public class Utils {
 
     /**
      * Picker基础属性设置
+     *
      * @param context
      * @param listener
      * @return
      */
-    public static OptionsPickerBuilder pickerBuilder(Context context,OnOptionsSelectListener listener){
+    public static OptionsPickerBuilder pickerBuilder(Context context, OnOptionsSelectListener listener) {
         return new OptionsPickerBuilder(context, listener).setContentTextSize(20)//设置滚轮文字大小
                 .setDividerColor(Color.LTGRAY)//设置分割线的颜色
                 .setSelectOptions(0, 0)//默认选中项
@@ -233,11 +268,12 @@ public class Utils {
 
     /**
      * 读取assets中的json文件
+     *
      * @param fileName 文件名
-     * @param context   上下文
+     * @param context  上下文
      * @return
      */
-    public static String getJson(String fileName,Context context) {
+    public static String getJson(String fileName, Context context) {
         //将json数据变成字符串
         StringBuilder stringBuilder = new StringBuilder();
         try {
@@ -258,13 +294,14 @@ public class Utils {
 
     /**
      * 将bitmap转成file
+     *
      * @param bitmap
      * @return
      */
     public static File getFile(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
-        File file = new File(Environment.getExternalStorageDirectory() + "/temp/"+(new Date().getTime())+".jpg");
+        File file = new File(Environment.getExternalStorageDirectory() + "/temp/" + (new Date().getTime()) + ".jpg");
         try {
             file.createNewFile();
             FileOutputStream fos = new FileOutputStream(file);

@@ -30,7 +30,7 @@ public class MainApplication extends Application {
         CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(context);
         strategy.setUploadProcess(processName == null || processName.equals(packageName));
         // 初始化Bugly
-        CrashReport.initCrashReport(context, "8ad2e5a786", isDebug, strategy);
+        CrashReport.initCrashReport(context, "ccced40fbb", isDebug, strategy);
         // bugly end
 
         // logger

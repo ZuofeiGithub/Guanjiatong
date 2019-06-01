@@ -4,8 +4,66 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
+        <!--状态栏-->
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <!-- 等待进度对话框样式 -->
+    <style name="myDialog" parent="@android:style/Theme.Dialog">
+        <!-- 边框 -->
+        <item name="android:windowFrame">@null</item>
+        <!-- 是否浮现在activity之上 -->
+        <item name="android:windowIsFloating">true</item>
+        <!-- 半透明 -->
+        <item name="android:windowIsTranslucent">true</item>
+        <!-- 没有标题 -->
+        <item name="android:windowNoTitle">true</item>
+        <!-- 背景透明 -->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <!-- 模糊 -->
+        <item name="android:backgroundDimEnabled">true</item>
+        <!-- 对话框是否有遮盖 -->
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+    <!--提交按钮样式-->
+    <style name="submitBtn">
+        <item name="android:background">@drawable/shape_button_bg</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/dp_44</item>
+        <item name="android:layout_marginLeft">@dimen/dp_35</item>
+        <item name="android:layout_marginRight">@dimen/dp_35</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">@dimen/sp_14</item>
+    </style>
+
+    <!--Tabbar-->
+    <style name="Tabbar">
+        <item name="android:layout_height">@dimen/dp_48</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">@dimen/sp_12</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:button">@null</item>
+        <item name="android:textColor">@drawable/selector_tv_tabbar</item>
+    </style>
+
+    <!--首页工具导航圆圈形状-->
+    <style name="HomeToolsShape">
+        <item name="android:layout_width">@dimen/dp_36</item>
+        <item name="android:layout_height">@dimen/dp_36</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">@dimen/sp_14</item>
+    </style>
+    <!--首页工具导航文字-->
+    <style name="HomeToolsText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_marginTop">@dimen/dp_5</item>
+        <item name="android:textSize">@dimen/sp_12</item>
+    </style>
 </resources>

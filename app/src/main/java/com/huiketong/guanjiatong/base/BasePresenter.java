@@ -56,17 +56,24 @@ public abstract class BasePresenter<V extends BaseView> {
         Logger.d(result);
         try{
             JsonObject object = new JsonParser().parse(result).getAsJsonObject();
-            if(object.has("code")){
-                String code = object.get("code").getAsString();
-                if(code.equals("500")){
-                    Logger.e("超时");
-//                    context.startActivity(new Intent(context, LoginActivity.class));
-                    ((Activity)context).finish();
-                    return false;
-                }else if(!code.equals("1")){
+            if(object.has("retStatus")){
+                String retStatus = object.get("retStatus").getAsString();
+                if(!retStatus.equals("100")){
                     Logger.e("请求失败");
-                    if(object.has("msg")){
-                        Utils.Toast(context,object.get("msg").getAsString());
+                    if(object.has("retValue")){
+                        Utils.Toast(context,object.get("retValue").getAsString());
+                    }else{
+                        Utils.Toast(context,"系统繁忙");
+                    }
+                    return false;
+                }
+                return true;
+            }else if(object.has("success")){
+                boolean success = object.get("success").getAsBoolean();
+                if(!success){
+                    Logger.e("请求失败");
+                    if(object.has("errorMsg")){
+                        Utils.Toast(context,object.get("errorMsg").getAsString());
                     }else{
                         Utils.Toast(context,"系统繁忙");
                     }
@@ -74,11 +81,11 @@ public abstract class BasePresenter<V extends BaseView> {
                 }
                 return true;
             }else{
-                Utils.Toast(context,"请求错误");
+                Utils.Toast(context,"请求错误10001");
                 return false;
             }
         }catch (Exception e){
-            Utils.Toast(context,"请求错误");
+            Utils.Toast(context,"请求错误10000");
             return false;
         }
 

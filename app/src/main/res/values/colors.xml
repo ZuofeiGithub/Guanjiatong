@@ -1,6 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorPrimary">#d63344</color>
+    <color name="colorPrimaryDark">#d64444</color>
     <color name="colorAccent">#D81B60</color>
+
+    <color name="bgColor">#fff</color>
+    <color name="line">#f2f2f2</color>
+    <color name="hintText">#8c8c8c</color>
+    <color name="btnBg">#d64444</color>
+    <color name="mainColor">#d74545</color>
+    <color name="mainBgColor">#efedf0</color>
+    <color name="tabbarDefault">#848285</color>
+
+    <color name="pickerBgColor">#fff</color>
+    <color name="pickerTitleBgColor">#f4f4f4</color>
+    <color name="pickerTitleColor">#000</color>
+    <color name="pickerCancelColor">#e55336</color>
+    <color name="pickerSubmitColor">#e55336</color>
+    <color name="pickerTextColorCenter">#e55336</color>
+
+
+    <color name="homeIntention">#ec6758</color>
+    <color name="homeUnderway">#fa762b</color>
+    <color name="homeExtension">#3aa2fb</color>
+    <color name="homeDone">#67d7d5</color>
+    <color name="homeToolsSelect">#f3f3f5</color>
 </resources>
