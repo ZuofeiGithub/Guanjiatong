@@ -5,7 +5,9 @@ import android.content.Context;
 import com.google.gson.Gson;
 import com.huiketong.guanjiatong.base.BasePresenter;
 import com.huiketong.guanjiatong.bean.BannerByUserCodeBean;
+import com.huiketong.guanjiatong.bean.ProjectInfoBean;
 import com.huiketong.guanjiatong.model.BannerModel;
+import com.huiketong.guanjiatong.model.ProjectModel;
 import com.huiketong.guanjiatong.utils.HttpCallback;
 import com.huiketong.guanjiatong.utils.HttpUtils;
 import com.huiketong.guanjiatong.view.ProjectView;
@@ -19,10 +21,11 @@ import okhttp3.Request;
  */
 public class ProjectPresenter extends BasePresenter<ProjectView> {
     private BannerModel bannerModel;
-
+    private ProjectModel projectModel;
     public ProjectPresenter(Context context) {
         this.context = context;
         bannerModel = new BannerModel();
+        projectModel = new ProjectModel();
     }
 
     /**
@@ -57,6 +60,23 @@ public class ProjectPresenter extends BasePresenter<ProjectView> {
      * @param projectcode
      */
     public void getProjectInfo(String projectcode){
+        projectModel.GetProjectInfo(projectcode, new HttpCallback() {
+            @Override
+            public void requestSuccess(String result) throws Exception {
+                result = HttpUtils.getJson(result);
+                ProjectInfoBean bean = new Gson().fromJson(result,ProjectInfoBean.class);
 
+            }
+
+            @Override
+            public void requestFaild(Request request, IOException io) {
+
+            }
+
+            @Override
+            public void complete() {
+
+            }
+        });
     }
 }

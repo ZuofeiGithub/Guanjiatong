@@ -1,5 +1,6 @@
 package com.huiketong.guanjiatong.model;
 
+import com.google.gson.JsonObject;
 import com.huiketong.guanjiatong.base.BaseModel;
 import com.huiketong.guanjiatong.utils.HttpCallback;
 import com.huiketong.guanjiatong.utils.HttpUtils;
@@ -44,10 +45,18 @@ public class ProjectModel extends BaseModel {
         params.put("p", p);
         params.put("ps", ps);
 
-        HttpUtils.getRequest(UrlUtils.GetProject,params,callback);
+        HttpUtils.getRequest(UrlUtils.GetProject, params, callback);
     }
 
-    public void GetProjectInfo(String projectcode){
-
+    /**
+     * 获取项目详情
+     *
+     * @param projectcode
+     * @param callback
+     */
+    public void GetProjectInfo(String projectcode, HttpCallback callback) {
+        Map<String,String> params = new HashMap<>();
+        params.put("projectcode", projectcode);
+        HttpUtils.getRequest(UrlUtils.GetProjectInfo, params, callback);
     }
 }
