@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <include layout="@layout/include_toolbar" app:layout_constraintTop_toTopOf="parent"/>
+    <LinearLayout
+        android:id="@+id/ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/bgColor"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+        <RelativeLayout style="@style/inputContainer">
+
+            <TextView
+                android:id="@+id/tv_lb_name"
+                style="@style/inputLabel"
+                android:text="客户姓名：" />
+
+            <EditText
+                android:id="@+id/et_name"
+                style="@style/inputEdit"
+                android:layout_toRightOf="@+id/tv_lb_name"
+                android:hint="*请输入客户姓名" />
+        </RelativeLayout>
+
+        <RelativeLayout style="@style/inputContainer">
+
+            <TextView
+                android:id="@+id/tv_lb_phone"
+                style="@style/inputLabel"
+                android:text="手机号码：" />
+
+            <EditText
+                android:id="@+id/et_phone"
+                style="@style/inputEdit"
+                android:layout_toRightOf="@+id/tv_lb_phone"
+                android:hint="*请输入手机号码"
+                android:inputType="number" />
+        </RelativeLayout>
+
+        <RelativeLayout style="@style/inputContainer">
+
+            <TextView
+                android:id="@+id/tv_lb_address"
+                style="@style/inputLabel"
+                android:text="装修地址：" />
+
+            <EditText
+                android:id="@+id/et_address"
+                style="@style/inputEdit"
+                android:layout_toRightOf="@+id/tv_lb_address"
+                android:hint="*请输入小区、楼号" />
+        </RelativeLayout>
+
+        <RelativeLayout style="@style/inputContainer">
+
+            <TextView
+                android:id="@+id/tv_lb_style"
+                style="@style/inputLabel"
+                android:text="装修风格：" />
+
+            <TextView
+                android:id="@+id/btn_select_style"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toRightOf="@+id/tv_lb_style"
+                android:gravity="center_vertical"
+                android:hint="*请选择装修风格"
+                android:textColor="@android:color/black"
+                android:textColorHint="@color/hintText"
+                android:textSize="@dimen/sp_12" />
+        </RelativeLayout>
+
+        <RelativeLayout style="@style/inputContainer">
+
+            <TextView
+                android:id="@+id/tv_lb_scheme"
+                style="@style/inputLabel"
+                android:text="装修方案：" />
+
+            <TextView
+                android:id="@+id/btn_select_scheme"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toRightOf="@+id/tv_lb_scheme"
+                android:gravity="center_vertical"
+                android:hint="*请选择装修方案"
+                android:textColor="@android:color/black"
+                android:textColorHint="@color/hintText"
+                android:textSize="@dimen/sp_12" />
+        </RelativeLayout>
+
+        <RelativeLayout style="@style/inputContainer">
+
+            <TextView
+                android:id="@+id/tv_lb_area"
+                style="@style/inputLabel"
+                android:text="房屋面积：" />
+
+            <EditText
+                android:id="@+id/et_area"
+                style="@style/inputEdit"
+                android:layout_toRightOf="@+id/tv_lb_area"
+                android:hint="*请输入房屋面积（m²）"
+                android:inputType="numberDecimal" />
+        </RelativeLayout>
+
+        <RelativeLayout style="@style/inputContainer">
+
+            <TextView
+                android:id="@+id/tv_lb_budget"
+                style="@style/inputLabel"
+                android:text="装修预算：" />
+
+            <EditText
+                android:id="@+id/et_budget"
+                style="@style/inputEdit"
+                android:layout_toRightOf="@+id/tv_lb_budget"
+                android:hint="*请输入装修预算（万）"
+                android:inputType="numberDecimal" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            style="@style/inputContainer"
+            android:background="@null">
+
+            <TextView
+                android:id="@+id/tv_lb_remark"
+                style="@style/inputLabel"
+                android:text="装修备注：" />
+
+            <EditText
+                android:id="@+id/et_remark"
+                style="@style/inputEdit"
+                android:layout_toRightOf="@+id/tv_lb_remark"
+                android:hint="非必填"/>
+        </RelativeLayout>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_submit"
+        style="@style/submitBtn"
+        android:layout_marginTop="@dimen/dp_30"
+        android:text="快速报名，秒赚佣金"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ll" />
+
+    <Button
+        android:id="@+id/btn_rule"
+        android:layout_width="@dimen/dp_120"
+        android:layout_height="@dimen/dp_32"
+        android:layout_marginTop="@dimen/dp_30"
+        android:background="@drawable/shape_button_rule_bg"
+        android:text="佣金规则"
+        android:textColor="@color/inputLabel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_submit" />
+</android.support.constraint.ConstraintLayout>

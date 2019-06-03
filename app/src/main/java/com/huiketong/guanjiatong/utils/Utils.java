@@ -160,6 +160,18 @@ public class Utils {
         editor.apply();
     }
 
+    /**
+     * 清除指定数据
+     * @param context
+     * @param key
+     */
+    public static void removeShare(Context context,String key){
+        SharedPreferences sp = context.getSharedPreferences(SHARED_FILE_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.remove(key);
+        editor.apply();
+
+    }
 
     /**
      * 根据手机的分辨率从dip转成px
@@ -317,4 +329,26 @@ public class Utils {
         }
         return file;
     }
+    /**
+     * 根据手机的分辨率从dip转成px
+     * @param context
+     * @param dpValue
+     * @return
+     */
+    public static int dpToPx(Context context, float dpValue){
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale +0.5f);
+    }
+
+    /**
+     * 根据手机的分辨率从px的单位转成为dp
+     * @param context
+     * @param pxValue
+     * @return
+     */
+    public static int pxToDp(Context context,float pxValue){
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (pxValue /scale + 0.5f);
+    }
+
 }

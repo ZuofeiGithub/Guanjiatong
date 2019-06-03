@@ -1,12 +1,13 @@
 package com.huiketong.guanjiatong.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
-import android.text.TextUtils;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,20 +18,24 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.huiketong.guanjiatong.R;
+import com.huiketong.guanjiatong.activity.ProjectActivity;
 import com.huiketong.guanjiatong.adapter.BannerAdapter;
+import com.huiketong.guanjiatong.adapter.ProjectListAdapter;
 import com.huiketong.guanjiatong.base.BaseFragment;
 import com.huiketong.guanjiatong.bean.BannerByUserCodeBean;
+import com.huiketong.guanjiatong.bean.ProjectCountBean;
+import com.huiketong.guanjiatong.bean.ProjectListItemBean;
 import com.huiketong.guanjiatong.presenter.HomePresenter;
 import com.huiketong.guanjiatong.utils.UrlUtils;
 import com.huiketong.guanjiatong.utils.Utils;
 import com.huiketong.guanjiatong.view.HomeView;
+import com.lcodecore.tkrefreshlayout.RefreshListenerAdapter;
+import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 import com.orhanobut.logger.Logger;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -41,7 +46,7 @@ import butterknife.Unbinder;
  * 首页
  */
 public class HomeFragment extends BaseFragment<HomeView, HomePresenter> implements HomeView {
-
+    // TODO 上拉加载
     @BindView(R.id.banner)
     ViewPager banner;
     @BindView(R.id.project_count0)
@@ -65,18 +70,25 @@ public class HomeFragment extends BaseFragment<HomeView, HomePresenter> implemen
     RelativeLayout projectCate3;
     @BindView(R.id.create_project)
     ImageButton createProject;
+    @BindView(R.id.tb_title)
+    TextView tbTitle;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 
     private String userCode;
     private String companyCode;
     private Handler bannerHandler;
     private int currBannerIndex = 0;
 
+    private int p;
+    private int ps = 1000;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.fragment_home, null);
         unbinder = ButterKnife.bind(this, view);
-
+        tbTitle.setText("装企管家通");
         projectList.setGroupIndicator(null);    //取消箭头，设置父节点不可展开
         //设置展开不可以点击
         projectList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
@@ -85,13 +97,16 @@ public class HomeFragment extends BaseFragment<HomeView, HomePresenter> implemen
                 return true;    //返回ture表示不可以点击
             }
         });
-        userCode =(String) Utils.getShared(getContext(),"usercode","");
-        companyCode = (String) Utils.getShared(getContext(),"companycode","");
-
+        userCode = (String) Utils.getShared(getContext(), "usercode", "");
+        companyCode = (String) Utils.getShared(getContext(), "companycode", "");
         // 获取banner
         getPresenter().getBanner(userCode);
 
+        // 获取项目统计
+        getPresenter().getReport(userCode, companyCode);
 
+        //获取项目列表
+        changeProjectState(0);
 
         return view;
     }
@@ -99,7 +114,6 @@ public class HomeFragment extends BaseFragment<HomeView, HomePresenter> implemen
     @Override
     public void onStart() {
         super.onStart();
-
 
 
     }
@@ -124,44 +138,28 @@ public class HomeFragment extends BaseFragment<HomeView, HomePresenter> implemen
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.project_cate0:
-                changeProjectCate("0");
+                changeProjectState(0);
                 resetColor();
                 projectCate0.setBackgroundResource(R.color.homeToolsSelect);
                 break;
             case R.id.project_cate1:
-                changeProjectCate("1");
+                changeProjectState(1);
                 resetColor();
-                projectCate0.setBackgroundResource(R.color.homeToolsSelect);
+                projectCate1.setBackgroundResource(R.color.homeToolsSelect);
                 break;
             case R.id.project_cate2:
-                changeProjectCate("2");
+                changeProjectState(2);
                 resetColor();
-                projectCate0.setBackgroundResource(R.color.homeToolsSelect);
+                projectCate2.setBackgroundResource(R.color.homeToolsSelect);
                 break;
             case R.id.project_cate3:
-                changeProjectCate("3");
+                changeProjectState(3);
                 resetColor();
-                projectCate0.setBackgroundResource(R.color.homeToolsSelect);
+                projectCate3.setBackgroundResource(R.color.homeToolsSelect);
                 break;
             case R.id.create_project:
                 break;
         }
-    }
-
-    /**
-     * 切换项目状态
-     *
-     * @param status
-     */
-    private void changeProjectCate(String status) {
-
-        Map<String, String> params = new HashMap<>();
-        params.put("userCode", userCode);
-        params.put("companyCode",companyCode);
-        params.put("projectstatus", status);
-        params.put("p", "1");
-        params.put("ps", "10000");
-
     }
 
     /**
@@ -174,9 +172,19 @@ public class HomeFragment extends BaseFragment<HomeView, HomePresenter> implemen
         projectCate3.setBackgroundResource(R.color.bgColor);
     }
 
+    /**
+     * 修改项目状态
+     *
+     * @param state 状态0意向，1进行中，2延期，3已完成
+     */
+    private void changeProjectState(int state) {
+        p = 1;
+        getPresenter().getProjectList(userCode, companyCode, state, p, ps);
+    }
+
     @Override
     public void onBannerSuccess(final BannerByUserCodeBean bean) {
-        if(bean.getRows().size() <= 0){
+        if (bean.getRows().size() <= 0) {
             return;
         }
         final List<View> list = new ArrayList<>();
@@ -228,6 +236,40 @@ public class HomeFragment extends BaseFragment<HomeView, HomePresenter> implemen
                 if (i == 0) {
                     bannerHandler.sendEmptyMessageDelayed(2, 2500);
                 }
+            }
+        });
+    }
+
+    @Override
+    public void onProjectCountSuccess(ProjectCountBean bean) {
+        projectCount0.setText(bean.get_$0());
+        projectCount1.setText(bean.get_$1());
+        projectCount2.setText(bean.get_$2());
+        projectCount3.setText(bean.get_$3());
+    }
+
+    @Override
+    public void onGetProjectListSuccess(List<String> groupName, final List<ProjectListItemBean> groupItem) {
+        ProjectListAdapter adapter = new ProjectListAdapter(getContext());
+        adapter.group = groupName;
+        adapter.item = groupItem;
+        projectList.setAdapter(adapter);
+        for (int i = 0; i < adapter.getGroupCount(); i++) {
+            projectList.expandGroup(i);
+        }
+        /**
+         * 选中项目
+         */
+        projectList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                Intent intent = new Intent(getActivity(), ProjectActivity.class);
+                intent.putExtra("projectcode",groupItem.get(groupPosition).getRows().get(childPosition).getProjectcode());
+                intent.putExtra("projectname",groupItem.get(groupPosition).getRows().get(childPosition).getProjectname());
+                intent.putExtra("housenumber",groupItem.get(groupPosition).getRows().get(childPosition).getHousenumber());
+                intent.putExtra("projectstatus",groupItem.get(groupPosition).getRows().get(childPosition).getProjectstatus());
+                startActivity(intent);
+                return false;
             }
         });
     }

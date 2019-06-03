@@ -25,4 +25,10 @@
     <color name="homeExtension">#3aa2fb</color>
     <color name="homeDone">#67d7d5</color>
     <color name="homeToolsSelect">#f3f3f5</color>
+    <color name="homeGroupItem">#e1ae39</color>
+    <color name="homeProgress">#d94545</color>
+    <color name="homeProgressDef">#dbd9da</color>
+
+
+    <color name="inputLabel">#828282</color>
 </resources>

@@ -354,6 +354,10 @@ public class HttpUtils {
      */
     public static String getJson(String str){
         str = StringEscapeUtils.unescapeJson(str);
-        return str.replace("\"{","{").replace("}\"","}");
+        str = str.replace("\"{","{").replace("}\"","}");
+        if(str.indexOf("\\\"") != -1){
+            str = getJson(str);
+        }
+        return str;
     }
 }

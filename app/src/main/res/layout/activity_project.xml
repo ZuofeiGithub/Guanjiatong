@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include
+        layout="@layout/include_toolbar"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!--banner-->
+    <android.support.v4.view.ViewPager
+        android:id="@+id/banner"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_192"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"></android.support.v4.view.ViewPager>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:padding="@dimen/dp_15"
+        app:layout_constraintTop_toBottomOf="@+id/banner">
+
+        <RelativeLayout
+            android:id="@+id/rl_top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tv_project_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxWidth="@dimen/dp_260"
+                android:maxLines="1"
+                android:text="重量11111撒点粉爱的色放"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/sp_16" />
+
+            <TextView
+                android:id="@+id/tv_project_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_project_name"
+                android:layout_marginTop="@dimen/dp_4"
+                android:maxWidth="@dimen/dp_260"
+                android:maxLines="1"
+                android:text="施工时间：至"
+                android:textColor="@color/hintText"
+                android:textSize="@dimen/sp_12" />
+
+            <TextView
+                android:id="@+id/tv_project_company"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_project_time"
+                android:layout_marginTop="@dimen/dp_4"
+                android:maxWidth="@dimen/dp_260"
+                android:maxLines="1"
+                android:text="施工单位："
+                android:textColor="@color/hintText"
+                android:textSize="@dimen/sp_12" />
+
+            <TextView
+                android:id="@+id/tv_state"
+                android:layout_width="@dimen/dp_55"
+                android:layout_height="@dimen/dp_24"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/shape_project_state"
+                android:gravity="center"
+                android:text="已完成"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/sp_12" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/rl_top">
+
+            <ImageView
+                android:id="@+id/iv1"
+                android:layout_width="@dimen/dp_25"
+                android:layout_height="@dimen/dp_25"
+                android:layout_centerVertical="true"
+                android:src="@drawable/icon_team" />
+
+            <TextView
+                android:id="@+id/tv1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/dp_4"
+                android:layout_toRightOf="@+id/iv1"
+                android:text="服务团队"
+                android:textColor="@color/mainColor"
+                android:textSize="@dimen/sp_12" />
+
+            <RelativeLayout
+                android:id="@+id/btn_team"
+                android:layout_centerVertical="true"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_40"
+                android:layout_toRightOf="@+id/tv1">
+
+                <LinearLayout
+                    android:id="@+id/ll_team"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="@dimen/dp_4"
+                    android:layout_toLeftOf="@+id/iv2"
+                    android:gravity="right|center_vertical"
+                    android:orientation="horizontal">
+
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/iv2"
+                    android:layout_width="@dimen/dp_15"
+                    android:layout_height="@dimen/dp_15"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/icon_right" />
+            </RelativeLayout>
+        </RelativeLayout>
+    </RelativeLayout>
+
+</android.support.constraint.ConstraintLayout>

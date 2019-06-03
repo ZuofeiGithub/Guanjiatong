@@ -74,8 +74,15 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter> 
      * @param tbTitle   标题
      */
     protected void setToolBar(Toolbar toolbar, TextView tbTitle){
+        setToolBar(toolbar,tbTitle,getTitle().toString());
+    }/**
+     * 设置导航栏
+     * @param toolbar   Toolbar
+     * @param tbTitle   标题
+     */
+    protected void setToolBar(Toolbar toolbar, TextView tbTitle,String title){
         this.setSupportActionBar(toolbar);
-        tbTitle.setText(getTitle().toString());
+        tbTitle.setText(title);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
