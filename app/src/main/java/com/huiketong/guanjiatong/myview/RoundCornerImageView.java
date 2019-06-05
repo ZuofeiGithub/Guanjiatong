@@ -47,6 +47,11 @@ public class RoundCornerImageView extends AppCompatImageView {
     //图片类型（矩形，圆形）
     private int shapeType;
 
+    public void setRound(int radius,int borderWidth){
+        this.radius = radius;
+        this.borderWidth = borderWidth;
+    }
+
     public RoundCornerImageView(Context context) {
         super(context);
         init(context,null);

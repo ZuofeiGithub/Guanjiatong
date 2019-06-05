@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.MappedByteBuffer;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -171,30 +173,6 @@ public class Utils {
         editor.remove(key);
         editor.apply();
 
-    }
-
-    /**
-     * 根据手机的分辨率从dip转成px
-     *
-     * @param context
-     * @param dpValue
-     * @return
-     */
-    public static int dipToPx(Context context, float dpValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (dpValue * scale + 0.5f);
-    }
-
-    /**
-     * 根据手机的分辨率从px的单位转成为dp
-     *
-     * @param context
-     * @param pxValue
-     * @return
-     */
-    public static int pxToDpi(Context context, float pxValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (pxValue / scale + 0.5f);
     }
 
     /**
@@ -350,5 +328,4 @@ public class Utils {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (pxValue /scale + 0.5f);
     }
-
 }

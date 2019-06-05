@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/dp_14"
+    android:paddingBottom="@dimen/dp_5"
+    android:foreground="?attr/selectableItemBackground">
+
+    <ImageView
+        android:layout_centerHorizontal="true"
+        android:id="@+id/iv_icon"
+        android:layout_width="@dimen/dp_30"
+        android:layout_height="@dimen/dp_30" />
+
+    <TextView
+        android:layout_centerHorizontal="true"
+        android:id="@+id/tv_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/iv_icon"
+        android:textSize="@dimen/sp_12"
+        android:layout_marginTop="@dimen/dp_10"
+        android:text="工地直播" />
+</RelativeLayout>

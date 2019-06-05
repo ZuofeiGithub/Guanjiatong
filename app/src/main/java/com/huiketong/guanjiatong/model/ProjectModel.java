@@ -59,4 +59,18 @@ public class ProjectModel extends BaseModel {
         params.put("projectcode", projectcode);
         HttpUtils.getRequest(UrlUtils.GetProjectInfo, params, callback);
     }
+
+    /**
+     * 获取项目团队用户
+     * @param projectcode 项目code
+     * @param p 页数
+     * @param ps ，每页个数
+     */
+    public void GetProjectTeamUser(String projectcode,String p,String ps,HttpCallback callback){
+        Map<String,String> params = new HashMap<>();
+        params.put("projectcode", projectcode);
+        params.put("p", p);
+        params.put("ps", ps);
+        HttpUtils.getRequest(UrlUtils.GetProjectTeamUser, params, callback);
+    }
 }
