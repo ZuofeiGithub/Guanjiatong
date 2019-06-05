@@ -218,7 +218,7 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
         }
         projectTeamUserBean = bean;
         for (int i = 0; i < bean.getRows().size(); i++) {
-            if (i == 7) {
+            if (i == 5) {
                 break;
             }
             RoundCornerImageView imageView = new RoundCornerImageView(this);
