@@ -8,6 +8,7 @@ import android.text.TextUtils;
 
 import com.huiketong.guanjiatong.utils.HttpUtils;
 import com.huiketong.guanjiatong.utils.Utils;
+import com.videogo.openapi.EZOpenSDK;
 
 /**
  * 启动初始化
@@ -17,15 +18,17 @@ public class LaunchActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         HttpUtils.setContext(getApplicationContext());
-
-        //判断uid是否存在
-        if(TextUtils.isEmpty((String) Utils.getShared(this,"uid",""))){
-            // 跳转登录界面
-            startActivity(new Intent(this , LoginActivity.class));
-        }else{
-            // 跳转首页
-            startActivity(new Intent(this , MainActivity.class));
-        }
+        EZOpenSDK.getInstance().setAccessToken("at.0uckqtwsdzjvwjxudcr8p2lp37gq8c7e-9dastjgmt6-1syof2a-b3c83cw2u");
+        startActivity(new Intent(this , SiteLiveActivity.class));
         finish();
+//        //判断uid是否存在
+//        if(TextUtils.isEmpty((String) Utils.getShared(this,"uid",""))){
+//            // 跳转登录界面
+//            startActivity(new Intent(this , LoginActivity.class));
+//        }else{
+//            // 跳转首页
+//            startActivity(new Intent(this , MainActivity.class));
+//        }
+//        finish();
     }
 }

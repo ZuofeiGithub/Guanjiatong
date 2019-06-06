@@ -8,7 +8,24 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
-
+    <!--萤石用到的-->
+    <style name="LoadingTextView">
+        <item name="textStyle">vertical</item>
+        <item name="textColor">#adadad</item>
+        <item name="textSize">@dimen/sp_12</item>
+        <item name="textPadding">@dimen/dp_5</item>
+        <item name="android:text">加载中，请稍候</item>
+    </style>
+    <style name="LoadingTextView_Percent" parent="LoadingTextView">
+        <item name="textPadding">@dimen/dp_10</item>
+        <item name="textSize">@dimen/sp_15</item>
+        <item name="android:text"/>
+    </style>
+    <style name="TitleBar_Dark">
+        <item name="textColor">@android:color/white</item>
+        <item name="background">@color/dark_bg_70p</item>
+        <item name="backButton">@drawable/selector_ez_message_back</item>
+    </style>
     <!-- 等待进度对话框样式 -->
     <style name="myDialog" parent="@android:style/Theme.Dialog">
         <!-- 边框 -->
@@ -94,5 +111,8 @@
         <item name="android:textColorHint">@color/inputLabel</item>
         <item name="android:textSize">@dimen/sp_12</item>
     </style>
-
+    <style name="popwindowUpAnim">
+        <item name="android:windowEnterAnimation">@anim/fade_up</item>
+        <item name="android:windowExitAnimation">@anim/fade_down</item>
+    </style>
 </resources>

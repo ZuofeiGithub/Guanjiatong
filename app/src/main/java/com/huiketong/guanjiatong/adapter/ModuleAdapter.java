@@ -1,7 +1,6 @@
 package com.huiketong.guanjiatong.adapter;
 
 import android.content.Context;
-import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -51,10 +50,20 @@ public class ModuleAdapter extends RecyclerView.Adapter<ModuleAdapter.Holder> {
 
     @NonNull
     @Override
-    public Holder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+    public Holder onCreateViewHolder(@NonNull ViewGroup viewGroup, final int i) {
         // 获取列表每行的布局文件
         View view = LayoutInflater.from(context).inflate(R.layout.list_tools_item, viewGroup, false);
         Holder holder = new Holder(view);
+        // 点击事件一般都写在绑定数据这里，当然写到上边的创建布局时候也是可以的
+        if (mItemClickListener != null){
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // 这里利用回调来给RecyclerView设置点击事件
+                    mItemClickListener.onItemClick(i);
+                }
+            });
+        }
         return holder;
     }
 
@@ -81,5 +90,14 @@ public class ModuleAdapter extends RecyclerView.Adapter<ModuleAdapter.Holder> {
             iv = itemView.findViewById(R.id.iv_icon);
             tv = itemView.findViewById(R.id.tv_name);
         }
+    }
+    // 利用接口 -> 给RecyclerView设置点击事件
+    private ItemClickListener mItemClickListener ;
+    public interface ItemClickListener{
+        public void onItemClick(int position) ;
+    }
+    public void setOnItemClickListener(ItemClickListener itemClickListener){
+        this.mItemClickListener = itemClickListener ;
+
     }
 }

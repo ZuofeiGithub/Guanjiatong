@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/realplay_page_ly"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/mainBgColor"
+    android:gravity="center"
+    android:orientation="vertical" >
+
+    <com.videogo.widget.TitleBar
+        android:id="@+id/title_bar_portrait"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <RelativeLayout
+        android:id="@+id/realplay_play_rl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@android:color/black" >
+
+        <SurfaceView
+            android:id="@+id/realplay_sv"
+            android:layout_width="600dp"
+            android:layout_height="200dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerInParent="false"
+            android:background="@android:color/transparent" />
+        <include layout="@layout/realplay_loading_layout" />
+        <!--
+                <include layout="@layout/realplay_control_layout" />
+         -->
+        <include layout="@layout/ez_play_control" />
+        <include layout="@layout/ez_realplay_prompt_layout" />
+
+        <RelativeLayout
+            android:id="@+id/realplay_capture_rl"
+            android:layout_width="@dimen/dp_65"
+            android:layout_height="@dimen/dp_45"
+            android:layout_alignBottom="@+id/realplay_sv"
+            android:layout_alignLeft="@+id/realplay_sv"
+            android:background="@android:color/white"
+            android:onClick="onClick"
+            android:padding="@dimen/dp_1"
+            android:visibility="gone" >
+
+            <ImageView
+                android:id="@+id/realplay_capture_iv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitXY" />
+
+            <ImageView
+                android:id="@+id/realplay_capture_watermark_iv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitXY"
+                android:src="@drawable/video_file_watermark"
+                android:visibility="gone" />
+        </RelativeLayout>
+
+        <include layout="@layout/ez_realplay_full_operate_layout" />
+
+        <ImageView
+            android:id="@+id/realplay_ptz_direction_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignBottom="@+id/realplay_sv"
+            android:background="@drawable/left_twinkle"
+            android:scaleType="fitXY"
+            android:visibility="gone" />
+
+        <ImageButton
+            android:id="@+id/realplay_full_anim_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/yuntai_pressed"
+            android:visibility="gone" />
+    </RelativeLayout>
+    <!--下面控制面板-->
+    <include layout="@layout/ez_realplay_operate_bar" android:visibility="gone"/>
+    <include layout="@layout/ez_realplay_operate_bar2" android:visibility="gone"/>
+</LinearLayout>

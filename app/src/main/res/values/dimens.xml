@@ -76,4 +76,12 @@
     <dimen name="dp_55">55dp</dimen>
     <dimen name="dp_70">70dp</dimen>
     <dimen name="dp_260">260dp</dimen>
+    <dimen name="dp_18">18dp</dimen>
+    <dimen name="dp_38">38dp</dimen>
+    <dimen name="dp_200">200dp</dimen>
+    <dimen name="sp_24">24sp</dimen>
+    <dimen name="sp_9">9sp</dimen>
+    <dimen name="dp_74">74dp</dimen>
+    <dimen name="sp_23">23sp</dimen>
+    <dimen name="dp_300">300dp</dimen>
 </resources>

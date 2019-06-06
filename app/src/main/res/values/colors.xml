@@ -29,6 +29,12 @@
     <color name="homeProgress">#d94545</color>
     <color name="homeProgressDef">#dbd9da</color>
 
-
     <color name="inputLabel">#828282</color>
+
+
+    <!--萤石-->
+    <color name="source_detection_btn_color">#48a9fb</color>
+    <color name="common_sub_text">#888888</color>
+    <color name="common_bg">#f0f0f3</color>
+    <color name="dark_bg_70p">#bb000000</color>
 </resources>
