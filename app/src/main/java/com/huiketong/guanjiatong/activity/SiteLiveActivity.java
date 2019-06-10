@@ -7,19 +7,23 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -51,6 +55,7 @@ import com.huiketong.guanjiatong.myview.WaitDialog;
 import com.huiketong.guanjiatong.presenter.SiteLivePresenter;
 import com.huiketong.guanjiatong.utils.AudioPlayUtil;
 import com.huiketong.guanjiatong.utils.DataManager;
+import com.huiketong.guanjiatong.utils.VerifyCodeInput;
 import com.huiketong.guanjiatong.view.SiteLiveView;
 import com.orhanobut.logger.Logger;
 import com.videogo.constant.Config;
@@ -59,6 +64,7 @@ import com.videogo.constant.IntentConsts;
 import com.videogo.errorlayer.ErrorInfo;
 import com.videogo.exception.BaseException;
 import com.videogo.exception.ErrorCode;
+import com.videogo.exception.InnerException;
 import com.videogo.openapi.EZConstants;
 import com.videogo.openapi.EZPlayer;
 import com.videogo.openapi.bean.EZCameraInfo;
@@ -67,7 +73,9 @@ import com.videogo.realplay.RealPlayStatus;
 import com.videogo.util.ConnectionDetector;
 import com.videogo.util.LocalInfo;
 import com.videogo.util.LogUtil;
+import com.videogo.util.MediaScanner;
 import com.videogo.util.RotateViewUtil;
+import com.videogo.util.SDCardUtil;
 import com.videogo.util.Utils;
 import com.videogo.widget.CheckTextButton;
 import com.videogo.widget.CustomRect;
@@ -75,6 +83,7 @@ import com.videogo.widget.CustomTouchListener;
 import com.videogo.widget.RingView;
 import com.videogo.widget.TitleBar;
 
+import java.util.Calendar;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -87,7 +96,8 @@ import static com.videogo.openapi.EZConstants.MSG_VIDEO_SIZE_CHANGED;
 /**
  * 工地直播
  */
-public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresenter> implements SiteLiveView, Handler.Callback, SurfaceHolder.Callback, View.OnTouchListener, View.OnClickListener {
+public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresenter> implements SiteLiveView,
+        Handler.Callback, SurfaceHolder.Callback, View.OnTouchListener, View.OnClickListener,VerifyCodeInput.VerifyCodeInputListener {
 
     private static final int ANIMATION_DURING_TIME = 500;
 
@@ -249,6 +259,7 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
     private PopupWindow mPtzPopupWindow = null;
     private PopupWindow mTalkPopupWindow = null;
     private RingView mTalkRingView = null;
+    private int mRecordSecond = 0;
 
 
     private LinearLayout mPtzControlLy = null;
@@ -282,6 +293,8 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
     private float mZoomScale = 0;
     private int mCommand = -1;
     private Button mTiletRightBtn = null;
+    private Button mTalkBackControlBtn;
+    private String mRecordTime = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -638,6 +651,7 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
             mControlDisplaySec = 0;
         }
     }
+
 
     /**
      * 播放器广播
@@ -1373,7 +1387,10 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-
+        if (mEZPlayer != null) {
+            mEZPlayer.setSurfaceHold(holder);
+        }
+        mRealPlaySh = holder;
     }
 
     @Override
@@ -1383,7 +1400,10 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-
+        if (mEZPlayer != null) {
+            mEZPlayer.setSurfaceHold(null);
+        }
+        mRealPlaySh = null;
     }
 
     @Override
@@ -1393,7 +1413,130 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
 
     @Override
     public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.realplay_play_btn:
+            case R.id.realplay_full_play_btn:
+            case R.id.realplay_play_iv:
+                if (mStatus != RealPlayStatus.STATUS_STOP) {
+                    stopRealPlay();
+                    setRealPlayStopUI();
+                } else {
+                    startRealPlay();
+                }
+                break;
+            case R.id.realplay_previously_btn:
+            case R.id.realplay_previously_btn2:
+            case R.id.realplay_full_previously_btn:
+                onCapturePicBtnClick();
+                break;
+            case R.id.realplay_capture_rl:
+                onCaptureRlClick();
+                break;
+            case R.id.realplay_video_btn:
+            case R.id.realplay_video_start_btn:
+            case R.id.realplay_video_btn2:
+            case R.id.realplay_video_start_btn2:
+            case R.id.realplay_full_video_btn:
+            case R.id.realplay_full_video_start_btn:
+                onRecordBtnClick();
+                break;
+            case R.id.realplay_talk_btn:
+            case R.id.realplay_talk_btn2:
+            case R.id.realplay_full_talk_btn:
+                startVoiceTalk();
+                break;
 
+            case R.id.realplay_quality_btn:
+                openQualityPopupWindow(mRealPlayQualityBtn);
+                break;
+            case R.id.realplay_ptz_btn:
+            case R.id.realplay_ptz_btn2:
+                openPtzPopupWindow(mRealPlayPlayRl);
+                break;
+            case R.id.realplay_full_ptz_btn:
+                setFullPtzStartUI(true);
+                break;
+            case R.id.realplay_full_ptz_anim_btn:
+                setFullPtzStopUI(true);
+                break;
+            case R.id.realplay_sound_btn:
+            case R.id.realplay_full_sound_btn:
+                onSoundBtnClick();
+                break;
+            case R.id.realplay_full_talk_anim_btn:
+                closeTalkPopupWindow(true, true);
+                break;
+            default:
+                break;
+        }
+    }
+    private void onCapturePicBtnClick() {
+
+        mControlDisplaySec = 0;
+        if (!SDCardUtil.isSDCardUseable()) {
+            // 提示SD卡不可用
+            //Prompt SD card is not available
+            Utils.showToast(this, R.string.remoteplayback_SDCard_disable_use);
+            return;
+        }
+
+        if (SDCardUtil.getSDCardRemainSize() < SDCardUtil.PIC_MIN_MEM_SPACE) {
+            // 提示内存不足
+            //Prompt for insufficient memory
+            Utils.showToast(this, R.string.remoteplayback_capture_fail_for_memory);
+            return;
+        }
+
+        if (mEZPlayer != null) {
+            mCaptureDisplaySec = 4;
+            updateCaptureUI();
+
+            Thread thr = new Thread() {
+                @Override
+                public void run() {
+                    Bitmap bmp = mEZPlayer.capturePicture();
+                    if (bmp != null) {
+                        try {
+                            mAudioPlayUtil.playAudioFile(AudioPlayUtil.CAPTURE_SOUND);
+
+                            // 可以采用deviceSerial+时间作为文件命名，demo中简化，只用时间命名
+                            //You can use deviceSerial + time as a file name, demo simplified, only time named
+                            java.util.Date date = new java.util.Date();
+                            final String path = Environment.getExternalStorageDirectory().getPath() + "/EZOpenSDK/CapturePicture/" + String.format("%tY", date)
+                                    + String.format("%tm", date) + String.format("%td", date) + "/"
+                                    + String.format("%tH", date) + String.format("%tM", date) + String.format("%tS", date) + String.format("%tL", date) +".jpg";
+
+                            if (TextUtils.isEmpty(path)) {
+                                bmp.recycle();
+                                bmp = null;
+                                return;
+                            }
+                            com.huiketong.guanjiatong.utils.Utils.saveCapturePictrue(path, bmp);
+
+
+                            MediaScanner mMediaScanner = new MediaScanner(SiteLiveActivity.this);
+                            mMediaScanner.scanFile(path, "jpg");
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(SiteLiveActivity.this, getResources().getString(R.string.already_saved_to_volume)+path, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        } catch (InnerException e) {
+                            e.printStackTrace();
+                        } finally {
+                            if (bmp != null) {
+                                bmp.recycle();
+                                bmp = null;
+                                return;
+                            }
+                        }
+                    }
+                    super.run();
+                }
+            };
+            thr.start();
+        }
     }
     // 播放
     private void handlePlaySuccess(Message msg) {
@@ -1435,6 +1578,80 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
         }
     }
 
+    private void handleHidePtzDirection(Message msg) {
+        if (mHandler == null) {
+            return;
+        }
+        mHandler.removeMessages(MSG_HIDE_PTZ_DIRECTION);
+        if (msg.arg1 > 2) {
+            mRealPlayPtzDirectionIv.setVisibility(View.GONE);
+        } else {
+            mRealPlayPtzDirectionIv.setVisibility(msg.arg1 == 1 ? View.GONE : View.VISIBLE);
+            Message message = new Message();
+            message.what = MSG_HIDE_PTZ_DIRECTION;
+            message.arg1 = msg.arg1 + 1;
+            mHandler.sendMessageDelayed(message, 500);
+        }
+    }
+    private void updateRealPlayUI() {
+        if (mControlDisplaySec == 5) {
+            mControlDisplaySec = 0;
+            hideControlRlAndFullOperateBar(false);
+        }
+        checkRealPlayFlow();
+        updateCaptureUI();
+
+        if (mIsRecording) {
+            updateRecordTime();
+        }
+    }
+
+    private void updateRecordTime() {
+        if (mRealPlayRecordIv.getVisibility() == View.VISIBLE) {
+            mRealPlayRecordIv.setVisibility(View.INVISIBLE);
+        } else {
+            mRealPlayRecordIv.setVisibility(View.VISIBLE);
+        }
+
+        int leftSecond = mRecordSecond % 3600;
+        int minitue = leftSecond / 60;
+        int second = leftSecond % 60;
+
+        String recordTime = String.format("%02d:%02d", minitue, second);
+        mRealPlayRecordTv.setText(recordTime);
+    }
+    private void checkRealPlayFlow() {
+        if ((mEZPlayer != null && mRealPlayFlowTv.getVisibility() == View.VISIBLE)) {
+            // 更新流量数据
+            //Update traffic data
+            long streamFlow = mEZPlayer.getStreamFlow();
+            updateRealPlayFlowTv(streamFlow);
+        }
+    }
+
+    private void updateRealPlayFlowTv(long streamFlow) {
+        long streamFlowUnit = streamFlow - mStreamFlow;
+        if (streamFlowUnit < 0)
+            streamFlowUnit = 0;
+        float fKBUnit = (float) streamFlowUnit / (float) Constant.KB;
+        String descUnit = String.format("%.2f k/s ", fKBUnit);
+        mRealPlayFlowTv.setText(descUnit);
+        mStreamFlow = streamFlow;
+    }
+
+    private void handleVoiceTalkSucceed() {
+        if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
+            openTalkPopupWindow(true);
+        } else {
+            mRealPlayFullTalkAnimBtn.setVisibility(View.VISIBLE);
+            //            mFullscreenFullButton.setVisibility(View.VISIBLE);
+            ((AnimationDrawable) mRealPlayFullTalkAnimBtn.getBackground()).start();
+        }
+
+        mRealPlayTalkBtn.setEnabled(true);
+        mRealPlayFullTalkBtn.setEnabled(true);
+        mRealPlayFullTalkAnimBtn.setEnabled(true);
+    }
     private void updatePtzUI() {
         if (!mIsOnPtz) {
             return;
@@ -1452,6 +1669,59 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
             setFullPtzStartUI(false);
         }
     }
+
+    private void setFullPtzStartUI(boolean startAnim) {
+        mIsOnPtz = true;
+        setPlayScaleUI(1, null, null);
+        if (mLocalInfo.getPtzPromptCount() < 3) {
+            mRealPlayFullPtzPromptIv.setBackgroundResource(R.drawable.ptz_prompt);
+            mRealPlayFullPtzPromptIv.setVisibility(View.VISIBLE);
+            mLocalInfo.setPtzPromptCount(mLocalInfo.getPtzPromptCount() + 1);
+            mHandler.removeMessages(MSG_CLOSE_PTZ_PROMPT);
+            mHandler.sendEmptyMessageDelayed(MSG_CLOSE_PTZ_PROMPT, 2000);
+        }
+        if (startAnim) {
+            mRealPlayFullAnimBtn.setBackgroundResource(R.drawable.yuntai_pressed);
+            mRealPlayFullPtzBtn.getLocationInWindow(mStartXy);
+            mEndXy[0] = Utils.dip2px(this, 20);
+            mEndXy[1] = mStartXy[1];
+            startFullBtnAnim(mRealPlayFullAnimBtn, mStartXy, mEndXy, new Animation.AnimationListener() {
+
+                @Override
+                public void onAnimationStart(Animation animation) {
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    mRealPlayFullPtzAnimBtn.setVisibility(View.VISIBLE);
+                    mRealPlayFullAnimBtn.setVisibility(View.GONE);
+                    onRealPlaySvClick();
+                    //                    mFullscreenFullButton.setVisibility(View.VISIBLE);
+                }
+            });
+        } else {
+            mRealPlayFullOperateBar.setVisibility(View.VISIBLE);
+            mRealPlayFullOperateBar.post(new Runnable() {
+
+                @Override
+                public void run() {
+                    mRealPlayFullPtzBtn.getLocationInWindow(mStartXy);
+                    mEndXy[0] = Utils.dip2px(SiteLiveActivity.this, 20);
+                    mEndXy[1] = mStartXy[1];
+
+                    mRealPlayFullOperateBar.setVisibility(View.GONE);
+                    mRealPlayFullPtzAnimBtn.setVisibility(View.VISIBLE);
+                    //                    mFullscreenFullButton.setVisibility(View.VISIBLE);
+                }
+
+            });
+        }
+    }
+
     // 设置播放器成功ui
     private void setRealPlaySuccessUI() {
         mStopTime = System.currentTimeMillis();
@@ -1461,7 +1731,7 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
         setLoadingSuccess();
         mRealPlayFlowTv.setVisibility(View.VISIBLE);
         mRealPlayFullFlowLy.setVisibility(View.VISIBLE);
-        mRealPlayBtn.setBackgroundResource(R.drawable.play_stop_selector);
+        mRealPlayBtn.setBackgroundResource(R.drawable.selector_ez_play_stop);
 
         if (mCameraInfo != null && mDeviceInfo != null) {
             mRealPlayCaptureBtn.setEnabled(true);
@@ -1475,7 +1745,7 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
                 mRealPlayPtzBtn.setEnabled(true);
             }
 
-            mRealPlayFullPlayBtn.setBackgroundResource(R.drawable.play_full_stop_selector);
+            mRealPlayFullPlayBtn.setBackgroundResource(R.drawable.selector_ez_play_full_stop);
             mRealPlayFullCaptureBtn.setEnabled(true);
             mRealPlayFullRecordBtn.setEnabled(true);
             mRealPlayFullPtzBtn.setEnabled(true);
@@ -1485,6 +1755,45 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
 
         startUpdateTimer();
     }
+
+
+    private void startUpdateTimer() {
+        stopUpdateTimer();
+        mUpdateTimer = new Timer();
+        mUpdateTimerTask = new TimerTask() {
+            @Override
+            public void run() {
+                if (mLandscapeTitleBar != null && mRealPlayControlRl != null
+                        && (mLandscapeTitleBar.getVisibility() == View.VISIBLE || mRealPlayControlRl.getVisibility() == View.VISIBLE)
+                        && mControlDisplaySec < 5) {
+                    mControlDisplaySec++;
+                }
+                if (mRealPlayCaptureRl != null && mRealPlayCaptureRl.getVisibility() == View.VISIBLE
+                        && mCaptureDisplaySec < 4) {
+                    mCaptureDisplaySec++;
+                }
+
+                if (mEZPlayer != null && mIsRecording) {
+
+
+
+                    Calendar OSDTime = mEZPlayer.getOSDTime();
+                    if (OSDTime != null) {
+                        String playtime = Utils.OSD2Time(OSDTime);
+                        if (!TextUtils.equals(playtime, mRecordTime)) {
+                            mRecordSecond++;
+                            mRecordTime = playtime;
+                        }
+                    }
+                }
+                if (mHandler != null) {
+                    mHandler.sendEmptyMessage(MSG_PLAY_UI_UPDATE);
+                }
+            }
+        };
+        mUpdateTimer.schedule(mUpdateTimerTask, 0, 1000);
+    }
+
     //显示类型
     private void showType() {
         if (Config.LOGGING && mEZPlayer != null) {
@@ -1518,6 +1827,39 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
             }
         }
     }
+
+    private void handleVoiceTalkFailed(ErrorInfo errorInfo) {
+        Logger.d("Talkback failed. " + errorInfo.toString());
+
+        closeTalkPopupWindow(true, false);
+
+        switch (errorInfo.errorCode) {
+            case ErrorCode.ERROR_TRANSF_DEVICE_TALKING:
+                Utils.showToast(this, R.string.realplay_play_talkback_fail_ison);
+                break;
+            case ErrorCode.ERROR_TRANSF_DEVICE_PRIVACYON:
+                Utils.showToast(this, R.string.realplay_play_talkback_fail_privacy);
+                break;
+            case ErrorCode.ERROR_TRANSF_DEVICE_OFFLINE:
+                Utils.showToast(this, R.string.realplay_fail_device_not_exist);
+                break;
+            case ErrorCode.ERROR_TTS_MSG_REQ_TIMEOUT:
+            case ErrorCode.ERROR_TTS_MSG_SVR_HANDLE_TIMEOUT:
+            case ErrorCode.ERROR_TTS_WAIT_TIMEOUT:
+            case ErrorCode.ERROR_TTS_HNADLE_TIMEOUT:
+                Utils.showToast(this, R.string.realplay_play_talkback_request_timeout, errorInfo.errorCode);
+                break;
+            case ErrorCode.ERROR_CAS_AUDIO_SOCKET_ERROR:
+            case ErrorCode.ERROR_CAS_AUDIO_RECV_ERROR:
+            case ErrorCode.ERROR_CAS_AUDIO_SEND_ERROR:
+                Utils.showToast(this, R.string.realplay_play_talkback_network_exception, errorInfo.errorCode);
+                break;
+            default:
+                Utils.showToast(this, R.string.realplay_play_talkback_fail, errorInfo.errorCode);
+                break;
+        }
+    }
+
     private void initUI() {
         mPageAnimDrawable = null;
         mRealPlaySoundBtn.setVisibility(View.VISIBLE);
@@ -1968,6 +2310,400 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
             mPageAnimIv.setBackgroundDrawable(null);
             mPageAnimIv.setVisibility(View.GONE);
         }
+    }
+    // 更新播放器错误ui
+    private void updateRealPlayFailUI(int errorCode) {
+        String txt = null;
+        Logger.i( "updateRealPlayFailUI: errorCode:" + errorCode);
+        // 判断返回的错误码
+        switch (errorCode) {
+            case ErrorCode.ERROR_TRANSF_ACCESSTOKEN_ERROR:  // 需要重新登录
+//                ActivityUtils.goToLoginAgain(EZRealPlayActivity.this);
+                Logger.e("重新登录");
+                return;
+            case ErrorCode.ERROR_CAS_MSG_PU_NO_RESOURCE:
+                txt = "设备连接数过大，停止其他连接后再试试吧";
+                break;
+            case ErrorCode.ERROR_TRANSF_DEVICE_OFFLINE:
+                if (mCameraInfo != null) {
+                    mCameraInfo.setIsShared(0);
+                }
+                txt = "设备不在线";
+                break;
+            case ErrorCode.ERROR_INNER_STREAM_TIMEOUT:
+                txt = "播放失败，连接设备异常";
+                break;
+            case ErrorCode.ERROR_WEB_CODE_ERROR:
+                //VerifySmsCodeUtil.openSmsVerifyDialog(Constant.SMS_VERIFY_LOGIN, this, this);
+                //txt = Utils.getErrorTip(this, R.string.check_feature_code_fail, errorCode);
+                break;
+            case ErrorCode.ERROR_WEB_HARDWARE_SIGNATURE_OP_ERROR:
+                //VerifySmsCodeUtil.openSmsVerifyDialog(Constant.SMS_VERIFY_HARDWARE, this, null);
+//                SecureValidate.secureValidateDialog(this, this);
+                //txt = Utils.getErrorTip(this, R.string.check_feature_code_fail, errorCode);
+                break;
+            case ErrorCode.ERROR_TRANSF_TERMINAL_BINDING:
+                txt = "请在萤石客户端关闭终端绑定 "
+                        + "Please close the terminal binding on the fluorite client";
+                break;
+            // 收到这两个错误码，可以弹出对话框，让用户输入密码后，重新取流预览
+            case ErrorCode.ERROR_INNER_VERIFYCODE_NEED:
+            case ErrorCode.ERROR_INNER_VERIFYCODE_ERROR: {
+                DataManager.getInstance().setDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial(), null);
+                VerifyCodeInput.VerifyCodeInputDialog(this, this).show();
+            }
+            break;
+            case ErrorCode.ERROR_EXTRA_SQUARE_NO_SHARING:
+            default:
+                txt = Utils.getErrorTip(this, R.string.realplay_play_fail, errorCode);
+                break;
+        }
+
+        if (!TextUtils.isEmpty(txt)) {
+            setRealPlayFailUI(txt);
+        } else {
+            setRealPlayStopUI();
+        }
+    }
+
+    @Override
+    public void onInputVerifyCode(String verifyCode) {
+        Logger.d( "verify code is " + verifyCode);
+        DataManager.getInstance().setDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial(), verifyCode);
+        if (mEZPlayer != null) {
+            startRealPlay();
+        }
+    }
+
+    private void setRealPlayFailUI(String errorStr) {
+        mStopTime = System.currentTimeMillis();
+        showType();
+
+        stopUpdateTimer();
+        updateOrientation();
+
+        {
+            setLoadingFail(errorStr);
+        }
+        mRealPlayFullFlowLy.setVisibility(View.GONE);
+        mRealPlayBtn.setBackgroundResource(R.drawable.selector_ez_play_play);
+
+        hideControlRlAndFullOperateBar(true);
+
+        if (mCameraInfo != null && mDeviceInfo != null) {
+            closePtzPopupWindow();
+            setFullPtzStopUI(false);
+
+            mRealPlayCaptureBtn.setEnabled(false);
+            mRealPlayRecordBtn.setEnabled(false);
+            if (mDeviceInfo.getStatus() == 1 && (mEZPlayer == null)) {
+                mRealPlayQualityBtn.setEnabled(true);
+            } else {
+                mRealPlayQualityBtn.setEnabled(false);
+            }
+            mRealPlayPtzBtn.setEnabled(false);
+            if (mDeviceInfo.getStatus() == 1) {
+                mRealPlayPrivacyBtn.setEnabled(true);
+                mRealPlaySslBtn.setEnabled(true);
+            } else {
+                mRealPlayPrivacyBtn.setEnabled(false);
+                mRealPlaySslBtn.setEnabled(false);
+            }
+
+            mRealPlayFullPlayBtn.setBackgroundResource(R.drawable.selector_ez_play_full_play);
+            mRealPlayFullCaptureBtn.setEnabled(false);
+            mRealPlayFullRecordBtn.setEnabled(false);
+            mRealPlayFullPtzBtn.setEnabled(false);
+        }
+    }
+
+    public void setLoadingFail(String errorStr) {
+        mRealPlayLoadingRl.setVisibility(View.VISIBLE);
+        mRealPlayTipTv.setVisibility(View.VISIBLE);
+        mRealPlayTipTv.setText(errorStr);
+        mRealPlayPlayLoading.setVisibility(View.GONE);
+        mRealPlayPlayIv.setVisibility(View.GONE);
+        mRealPlayPlayPrivacyLy.setVisibility(View.GONE);
+    }
+
+    private void handleSetVedioModeSuccess() {
+        closeQualityPopupWindow();
+        setVideoLevel();
+        try {
+            mWaitDialog.setWaitText(null);
+            mWaitDialog.dismiss();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (mStatus == RealPlayStatus.STATUS_PLAY) {
+            // 停止播放 Stop play
+            stopRealPlay();
+            SystemClock.sleep(500);
+            // 开始播放 start play
+            startRealPlay();
+        }
+    }
+
+    private void startRealPlay() {
+        // 增加手机客户端操作信息记录
+        //Increase the mobile client operation information record
+        Logger.d( "startRealPlay");
+
+        if (mStatus == RealPlayStatus.STATUS_START || mStatus == RealPlayStatus.STATUS_PLAY) {
+            return;
+        }
+
+        // 检查网络是否可用
+        //Check if the network is available
+        if (!ConnectionDetector.isNetworkAvailable(this)) {
+            // 提示没有连接网络
+            //Prompt not to connect to the network
+            setRealPlayFailUI("视频播放失败，请检查您的网络");
+            return;
+        }
+
+        mStatus = RealPlayStatus.STATUS_START;
+        setRealPlayLoadingUI();
+
+        if (mCameraInfo != null) {
+            //if (mEZPlayer == null) {
+            mEZPlayer = MainApplication.getOpenSDK().createPlayer(mCameraInfo.getDeviceSerial(), mCameraInfo.getCameraNo());
+//              mEZPlayer = EzvizApplication.getOpenSDK().createPlayerWithUrl("ysproto://vtm.ys7.com:8554/live?dev=473224256&chn=1&stream=1&cln=1&isp=0&biz=3");
+//              mEZPlayer = EzvizApplication.getOpenSDK().createPlayerWithDeviceSerial(EZRealPlayActivity.this, mCameraInfo.getDeviceSerial(), mCameraInfo.getChannelNo(), 1);
+//            }
+            if (mEZPlayer == null)
+                return;
+            if (mDeviceInfo == null) {
+                return;
+            }
+            if (mDeviceInfo.getIsEncrypt() == 1) {
+                mEZPlayer.setPlayVerifyCode(DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial()));
+            }
+
+            mEZPlayer.setHandler(mHandler);
+            mEZPlayer.setSurfaceHold(mRealPlaySh);
+            mEZPlayer.startRealPlay();
+        } else if (mRtspUrl != null) {
+            mEZPlayer = MainApplication.getOpenSDK().createPlayerWithUrl(mRtspUrl);
+            //mStub.setCameraId(mCameraInfo.getCameraId());////****  mj
+            if (mEZPlayer == null)
+                return;
+            mEZPlayer.setHandler(mHandler);
+            mEZPlayer.setSurfaceHold(mRealPlaySh);
+
+            mEZPlayer.startRealPlay();
+        }
+        updateLoadingProgress(0);
+    }
+
+    /**
+     * 设置播放器加载ui
+     */
+    private void setRealPlayLoadingUI() {
+        mStartTime = System.currentTimeMillis();
+        //mRealPlaySv.setVisibility(View.INVISIBLE);
+        //mRealPlaySv.setVisibility(View.VISIBLE);
+        setStartloading();
+        mRealPlayBtn.setBackgroundResource(R.drawable.selector_ez_play_stop);
+
+        if (mCameraInfo != null  && mDeviceInfo != null) {
+            mRealPlayCaptureBtn.setEnabled(false);
+            mRealPlayRecordBtn.setEnabled(false);
+            if (mDeviceInfo.getStatus() == 1) {
+                mRealPlayQualityBtn.setEnabled(true);
+            } else {
+                mRealPlayQualityBtn.setEnabled(false);
+            }
+            mRealPlayPtzBtn.setEnabled(false);
+
+            mRealPlayFullPlayBtn.setBackgroundResource(R.drawable.selector_ez_play_full_stop);
+            mRealPlayFullCaptureBtn.setEnabled(false);
+            mRealPlayFullRecordBtn.setEnabled(false);
+            mRealPlayFullFlowLy.setVisibility(View.GONE);
+            mRealPlayFullPtzBtn.setEnabled(false);
+        }
+
+        showControlRlAndFullOperateBar();
+    }
+
+    private void setStartloading() {
+        mRealPlayLoadingRl.setVisibility(View.VISIBLE);
+        mRealPlayTipTv.setVisibility(View.GONE);
+        mRealPlayPlayLoading.setVisibility(View.VISIBLE);
+        mRealPlayPlayIv.setVisibility(View.GONE);
+        mRealPlayPlayPrivacyLy.setVisibility(View.GONE);
+    }
+
+    private void handleSetVedioModeFail(int errorCode) {
+        closeQualityPopupWindow();
+        setVideoLevel();
+        try {
+            mWaitDialog.setWaitText(null);
+            mWaitDialog.dismiss();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Utils.showToast(this, R.string.realplay_set_vediomode_fail, errorCode);
+    }
+
+    private void handlePtzControlFail(Message msg) {
+        Logger.d( "handlePtzControlFail:" + msg.arg1);
+        switch (msg.arg1) {
+            case ErrorCode.ERROR_CAS_PTZ_CONTROL_CALLING_PRESET_FAILED:
+                // 正在调用预置点，键控动作无效
+                //Calling preset point, key action is invalid
+                Utils.showToast(this, R.string.camera_lens_too_busy, msg.arg1);
+                break;
+            case ErrorCode.ERROR_CAS_PTZ_PRESET_PRESETING_FAILE:// 当前正在调用预置点
+                Utils.showToast(this, R.string.ptz_is_preseting, msg.arg1);
+                break;
+            case ErrorCode.ERROR_CAS_PTZ_CONTROL_TIMEOUT_SOUND_LACALIZATION_FAILED:
+                // 当前正在声源定位
+                //Is currently locating at sound source
+                break;
+            case ErrorCode.ERROR_CAS_PTZ_CONTROL_TIMEOUT_CRUISE_TRACK_FAILED:
+                // 键控动作超时(当前正在轨迹巡航)
+                //Key action timeout (currently tracing)
+                Utils.showToast(this, R.string.ptz_control_timeout_cruise_track_failed, msg.arg1);
+                break;
+            case ErrorCode.ERROR_CAS_PTZ_PRESET_INVALID_POSITION_FAILED:
+                // 当前预置点信息无效
+                //The current preset information is invalid
+                Utils.showToast(this, R.string.ptz_preset_invalid_position_failed, msg.arg1);
+                break;
+            case ErrorCode.ERROR_CAS_PTZ_PRESET_CURRENT_POSITION_FAILED:
+                // 该预置点已是当前位置
+                //The preset point is the current position
+                Utils.showToast(this, R.string.ptz_preset_current_position_failed, msg.arg1);
+                break;
+            case ErrorCode.ERROR_CAS_PTZ_PRESET_SOUND_LOCALIZATION_FAILED:
+                // 设备正在响应本次声源定位
+                //The device is responding to this sound source location
+                Utils.showToast(this, R.string.ptz_preset_sound_localization_failed, msg.arg1);
+                break;
+            case ErrorCode.ERROR_CAS_PTZ_OPENING_PRIVACY_FAILED:// 当前正在开启隐私遮蔽 Is currently opening privacy masking
+            case ErrorCode.ERROR_CAS_PTZ_CLOSING_PRIVACY_FAILED:// 当前正在关闭隐私遮蔽   The privacy mask is currently being turned off
+            case ErrorCode.ERROR_CAS_PTZ_MIRRORING_FAILED:// 设备正在镜像操作（设备镜像要几秒钟，防止频繁镜像操作）The device is mirroring (the device mirroring takes a few seconds to prevent frequent mirroring)
+                Utils.showToast(this, R.string.ptz_operation_too_frequently, msg.arg1);
+                break;
+            case ErrorCode.ERROR_CAS_PTZ_CONTROLING_FAILED:// 设备正在键控动作（上下左右）(一个客户端在上下左右控制，另外一个在开其它东西) The device is keying action (up and down left and right) (a client in the upper and lower left and right control, the other one in the open other things)
+                break;
+            case ErrorCode.ERROR_CAS_PTZ_FAILED:// 云台当前操作失败 PTZ current operation failed
+                break;
+            case ErrorCode.ERROR_CAS_PTZ_PRESET_EXCEED_MAXNUM_FAILED:// 当前预置点超过最大个数 The current preset exceeds the maximum number
+                Utils.showToast(this, R.string.ptz_preset_exceed_maxnum_failed, msg.arg1);
+                break;
+            case ErrorCode.ERROR_CAS_PTZ_PRIVACYING_FAILED:// 设备处于隐私遮蔽状态（关闭了镜头，再去操作云台相关）The device is in a privacy state (close the lens, and then operate the PTZ related)
+                Utils.showToast(this, R.string.ptz_privacying_failed, msg.arg1);
+                break;
+            case ErrorCode.ERROR_CAS_PTZ_TTSING_FAILED:// 设备处于语音对讲状态(区别以前的语音对讲错误码，云台单独列一个）Equipment in the voice intercom state (the difference between the previous voice intercom error code, PTZ separate one)
+                Utils.showToast(this, R.string.ptz_mirroring_failed, msg.arg1);
+                break;
+            case ErrorCode.ERROR_CAS_PTZ_ROTATION_UP_LIMIT_FAILED:// 设备云台旋转到达上限位 The PTZ rotation reaches the upper limit
+            case ErrorCode.ERROR_CAS_PTZ_ROTATION_DOWN_LIMIT_FAILED:// 设备云台旋转到达下限位 The PTZ rotation reaches the lower limit
+            case ErrorCode.ERROR_CAS_PTZ_ROTATION_LEFT_LIMIT_FAILED:// 设备云台旋转到达左限位  The PTZ rotation reaches the left limit
+            case ErrorCode.ERROR_CAS_PTZ_ROTATION_RIGHT_LIMIT_FAILED:// 设备云台旋转到达右限位 The PTZ rotation reaches the right limit
+                setPtzDirectionIv(-1, msg.arg1);
+                break;
+            default:
+                Utils.showToast(this, R.string.ptz_operation_failed, msg.arg1);
+                break;
+        }
+    }
+
+    private void updateTalkUI() {
+        if (!mIsOnTalk) {
+            return;
+        }
+        if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
+            if (mRealPlayFullTalkAnimBtn != null) {
+                mRealPlayFullTalkAnimBtn.setVisibility(View.GONE);
+                mFullscreenFullButton.setVisibility(View.GONE);
+            }
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    openTalkPopupWindow(false);
+                }
+            });
+        } else {
+            if (mRealPlayFullTalkAnimBtn != null) {
+                mRealPlayFullOperateBar.setVisibility(View.VISIBLE);
+                mRealPlayFullOperateBar.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        mRealPlayFullTalkBtn.getLocationInWindow(mStartXy);
+                        mEndXy[0] = Utils.dip2px(SiteLiveActivity.this, 20);
+                        mEndXy[1] = mStartXy[1];
+
+                        mRealPlayFullOperateBar.setVisibility(View.GONE);
+                        mRealPlayFullTalkAnimBtn.setVisibility(View.VISIBLE);
+                        //                        mFullscreenFullButton.setVisibility(View.VISIBLE);
+                        ((AnimationDrawable) mRealPlayFullTalkAnimBtn.getBackground()).start();
+                    }
+
+                });
+            }
+            closeTalkPopupWindow(false, false);
+        }
+    }
+
+    /**
+     * 打开对讲窗口
+     * @param showAnimation
+     */
+    private void openTalkPopupWindow(boolean showAnimation) {
+        if (mEZPlayer == null && mDeviceInfo == null) {
+            return;
+        }
+        closeTalkPopupWindow(false, false);
+        LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        ViewGroup layoutView = (ViewGroup) layoutInflater.inflate(R.layout.ez_realplay_talkback_wnd, null, true);
+        layoutView.setFocusable(true);
+        layoutView.setFocusableInTouchMode(true);
+        layoutView.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View arg0, int arg1, KeyEvent arg2) {
+                if (arg1 == KeyEvent.KEYCODE_BACK) {
+                    Logger.i( "KEYCODE_BACK DOWN");
+                    closeTalkPopupWindow(true, false);
+                }
+                return false;
+            }
+        });
+
+        ImageButton talkbackCloseBtn = (ImageButton) layoutView.findViewById(R.id.talkback_close_btn);
+        talkbackCloseBtn.setOnClickListener(mOnPopWndClickListener);
+        mTalkRingView = (RingView) layoutView.findViewById(R.id.talkback_rv);
+        mTalkBackControlBtn = (Button) layoutView.findViewById(R.id.talkback_control_btn);
+        mTalkBackControlBtn.setOnTouchListener(mOnTouchListener);
+
+        if (mDeviceInfo.isSupportTalk() == EZConstants.EZTalkbackCapability.EZTalkbackFullDuplex) {
+            mTalkRingView.setVisibility(View.VISIBLE);
+            mTalkBackControlBtn.setEnabled(false);
+            mTalkBackControlBtn.setText(R.string.talking);
+        }
+
+        int height = mLocalInfo.getScreenHeight() - mPortraitTitleBar.getHeight() - mRealPlayPlayRl.getHeight()
+                - (mRealPlayRect != null ? mRealPlayRect.top : mLocalInfo.getNavigationBarHeight());
+        mTalkPopupWindow = new PopupWindow(layoutView, RelativeLayout.LayoutParams.MATCH_PARENT, height, true);
+        if (showAnimation) {
+            mTalkPopupWindow.setAnimationStyle(R.style.popwindowUpAnim);
+        }
+        mTalkPopupWindow.setFocusable(false);
+        mTalkPopupWindow.setOutsideTouchable(false);
+        mTalkPopupWindow.showAsDropDown(mRealPlayPlayRl);
+        mTalkPopupWindow.update();
+        mTalkRingView.post(new Runnable() {
+            @Override
+            public void run() {
+                if (mTalkRingView != null) {
+                    mTalkRingView.setMinRadiusAndDistance(mTalkBackControlBtn.getHeight() / 2f,
+                            Utils.dip2px(SiteLiveActivity.this, 22));
+                }
+            }
+        });
     }
 
 }
