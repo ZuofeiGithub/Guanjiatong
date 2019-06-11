@@ -9,6 +9,11 @@ public class UrlUtils {
     public static String baseUrl = "https://www.guanjiatong.com.cn";
     // api url
     public static String apiUrl = baseUrl + "/api/service/";
+
+    //萤石云后台接口地址
+    public static String cameraUrl = "https://gjt.jkt365.com/api/";
+    //获取直播地址
+    public static String LiveAddress = cameraUrl + "get_device_live_address";
     /**
      * 登录模块
      */

@@ -1,6 +1,5 @@
 package com.huiketong.guanjiatong.base;
 
-import android.app.Activity;
 import android.content.Context;
 
 import com.google.gson.JsonObject;

@@ -5,6 +5,7 @@ import com.huiketong.guanjiatong.bean.BannerByUserCodeBean;
 import com.huiketong.guanjiatong.bean.ModuleBean;
 import com.huiketong.guanjiatong.bean.ProjectInfoBean;
 import com.huiketong.guanjiatong.bean.ProjectTeamUserBean;
+import com.videogo.openapi.bean.EZDeviceInfo;
 
 /**
  * 项目详情
@@ -34,4 +35,9 @@ public interface ProjectView extends BaseView {
      * @param bean
      */
     void getModuleSuccess(ModuleBean bean);
+
+    /**
+     * 获取设备信息
+     */
+    void getDeviceInfoSuccess(EZDeviceInfo bean);
 }

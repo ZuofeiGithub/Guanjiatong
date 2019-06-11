@@ -10,6 +10,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -30,6 +31,8 @@ import com.huiketong.guanjiatong.utils.Utils;
 import com.huiketong.guanjiatong.view.ProjectView;
 import com.orhanobut.logger.Logger;
 import com.squareup.picasso.Picasso;
+import com.videogo.constant.IntentConsts;
+import com.videogo.openapi.bean.EZDeviceInfo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,11 +68,12 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
 
     private String projectcode, projectname, housenumber;
     private int projectstatus;
+    private EZDeviceInfo deviceInfo;
 
     private String userCode;
     private Handler bannerHandler;
     private int currBannerIndex = 0;
-
+    private int code_result = 0;
     private ProjectTeamUserBean projectTeamUserBean;
     private String[] modules = {
 //            "760748040ad343b79d19c63c9b7556e4", //基础信息
@@ -139,6 +143,8 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
         getPresenter().getTeamList(projectcode, 1, 100);
         // 获取功能列表
         getPresenter().getModule(userCode);
+        //获取设备信息
+        getPresenter().getDeviceInfo(projectcode);
     }
 
     @Override
@@ -210,6 +216,11 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
     public void getProjectInfoSuccess(ProjectInfoBean bean) {
         tvProjectTime.setText("施工时间：" + bean.getStartdate().substring(0, 10) + "至" + bean.getEnddate().substring(0, 10));
         tvProjectCompany.setText("施工单位：" + bean.getCompanyname());
+    }
+
+    @Override
+    public void getDeviceInfoSuccess(EZDeviceInfo bean) {
+        deviceInfo = bean;
     }
 
     @Override
@@ -295,14 +306,16 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
 
                         break;
                     case "65582869dece4dad8f1ce280be867467":    //工地直播
-
+                        intent = new Intent(ProjectActivity.this,SiteLiveActivity.class);
+                        intent.putExtra(IntentConsts.EXTRA_DEVICE_INFO,deviceInfo);
+                        code_result = 300;
                         break;
                     case "da41230e-b26f-4e63-907b-63f2b28a279c":    //TODO 处罚
 
                         break;
                 }
                 if(intent != null){
-                    startActivity(intent);
+                    startActivityForResult(intent,code_result);
                 }
             }
         });

@@ -1,19 +1,24 @@
 package com.huiketong.guanjiatong.presenter;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.huiketong.guanjiatong.base.BasePresenter;
 import com.huiketong.guanjiatong.bean.BannerByUserCodeBean;
+import com.huiketong.guanjiatong.bean.DeviceInfoResp;
 import com.huiketong.guanjiatong.bean.ModuleBean;
 import com.huiketong.guanjiatong.bean.ProjectInfoBean;
 import com.huiketong.guanjiatong.bean.ProjectTeamUserBean;
 import com.huiketong.guanjiatong.model.BannerModel;
+import com.huiketong.guanjiatong.model.DeviceInfoModel;
 import com.huiketong.guanjiatong.model.OtherModel;
 import com.huiketong.guanjiatong.model.ProjectModel;
 import com.huiketong.guanjiatong.utils.HttpCallback;
 import com.huiketong.guanjiatong.utils.HttpUtils;
+import com.huiketong.guanjiatong.utils.Utils;
 import com.huiketong.guanjiatong.view.ProjectView;
+import com.videogo.openapi.bean.EZDeviceInfo;
 
 import java.io.IOException;
 
@@ -26,11 +31,13 @@ public class ProjectPresenter extends BasePresenter<ProjectView> {
     private BannerModel bannerModel;
     private ProjectModel projectModel;
     private OtherModel otherModel;
+    private DeviceInfoModel deviceInfoModel;
     public ProjectPresenter(Context context) {
         this.context = context;
         bannerModel = new BannerModel();
         projectModel = new ProjectModel();
         otherModel = new OtherModel();
+        deviceInfoModel = new DeviceInfoModel();
     }
 
     /**
@@ -73,6 +80,40 @@ public class ProjectPresenter extends BasePresenter<ProjectView> {
                 result = HttpUtils.getJson(result);
                 ProjectInfoBean bean = new Gson().fromJson(result, ProjectInfoBean.class);
                 getView().getProjectInfoSuccess(bean);
+            }
+
+            @Override
+            public void requestFaild(Request request, IOException io) {
+
+            }
+
+            @Override
+            public void complete() {
+
+            }
+        });
+    }
+
+    /**
+     * 获取设备信息
+     * @param projectcode
+     */
+    public void getDeviceInfo(String projectcode){
+        deviceInfoModel.getDeviceInfo(projectcode, new HttpCallback() {
+            @Override
+            public void requestSuccess(String result) throws Exception {
+                result = HttpUtils.getJson(result);
+                DeviceInfoResp deviceInfoResp = new Gson().fromJson(result,DeviceInfoResp.class);
+                EZDeviceInfo ezDeviceInfo = new EZDeviceInfo();
+                ezDeviceInfo.setDeviceName(deviceInfoResp.getData().getDeviceInfo().getDeviceName());
+                ezDeviceInfo.setAddTime(deviceInfoResp.getData().getDeviceInfo().getAddTime());
+                ezDeviceInfo.setCameraNum(deviceInfoResp.getData().getDeviceInfo().getCameraNum());
+                ezDeviceInfo.setCategory(deviceInfoResp.getData().getDeviceInfo().getCategory());
+                ezDeviceInfo.setDetectorNum(deviceInfoResp.getData().getDeviceInfo().getDetectorNum());
+                ezDeviceInfo.setDeviceCover(deviceInfoResp.getData().getDeviceInfo().getDeviceCover());
+                ezDeviceInfo.setDeviceSerial(deviceInfoResp.getData().getDeviceInfo().getDeviceSerial());
+                ezDeviceInfo.setDeviceType(deviceInfoResp.getData().getDeviceInfo().getDeviceType());
+                getView().getDeviceInfoSuccess(ezDeviceInfo);
             }
 
             @Override

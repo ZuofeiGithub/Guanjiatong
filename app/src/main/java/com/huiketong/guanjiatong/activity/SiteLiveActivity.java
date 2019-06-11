@@ -22,6 +22,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -34,6 +35,7 @@ import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
@@ -99,6 +101,8 @@ import static com.videogo.openapi.EZConstants.MSG_VIDEO_SIZE_CHANGED;
 public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresenter> implements SiteLiveView,
         Handler.Callback, SurfaceHolder.Callback, View.OnTouchListener, View.OnClickListener,VerifyCodeInput.VerifyCodeInputListener {
 
+
+    private static final String TAG = "RealPlayerActivity";
     private static final int ANIMATION_DURING_TIME = 500;
 
     public static final float BIG_SCREEN_RATIO = 1.60f;
@@ -1430,7 +1434,7 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
                 onCapturePicBtnClick();
                 break;
             case R.id.realplay_capture_rl:
-                onCaptureRlClick();
+                //onCaptureRlClick();
                 break;
             case R.id.realplay_video_btn:
             case R.id.realplay_video_start_btn:
@@ -1438,16 +1442,16 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
             case R.id.realplay_video_start_btn2:
             case R.id.realplay_full_video_btn:
             case R.id.realplay_full_video_start_btn:
-                onRecordBtnClick();
+                //onRecordBtnClick();
                 break;
             case R.id.realplay_talk_btn:
             case R.id.realplay_talk_btn2:
             case R.id.realplay_full_talk_btn:
-                startVoiceTalk();
+                //startVoiceTalk();
                 break;
 
             case R.id.realplay_quality_btn:
-                openQualityPopupWindow(mRealPlayQualityBtn);
+                //openQualityPopupWindow(mRealPlayQualityBtn);
                 break;
             case R.id.realplay_ptz_btn:
             case R.id.realplay_ptz_btn2:
@@ -1461,7 +1465,7 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
                 break;
             case R.id.realplay_sound_btn:
             case R.id.realplay_full_sound_btn:
-                onSoundBtnClick();
+                //onSoundBtnClick();
                 break;
             case R.id.realplay_full_talk_anim_btn:
                 closeTalkPopupWindow(true, true);
@@ -1538,6 +1542,44 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
             thr.start();
         }
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            return;
+        }
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                if (mRealPlaySv != null) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(mRealPlaySv.getWindowToken(), 0);
+                }
+            }
+        }, 200);
+
+        initUI();
+        //mRealPlaySv.setVisibility(View.VISIBLE);
+
+        LogUtil.infoLog(TAG, "onResume real play status:" + mStatus);
+        if (mCameraInfo != null && mDeviceInfo != null &&  mDeviceInfo.getStatus() != 1) {
+            if (mStatus != RealPlayStatus.STATUS_STOP) {
+                stopRealPlay();
+            }
+            setRealPlayFailUI(getString(R.string.realplay_fail_device_not_exist));
+        } else {
+            if (mStatus == RealPlayStatus.STATUS_INIT || mStatus == RealPlayStatus.STATUS_PAUSE
+                    || mStatus == RealPlayStatus.STATUS_DECRYPT) {
+                // 开始播放
+                startRealPlay();
+            }
+        }
+        mIsOnStop = false;
+    }
+
+
     // 播放
     private void handlePlaySuccess(Message msg) {
         Logger.d("handlePlaySuccess");
@@ -2042,15 +2084,15 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
-                case R.id.quality_hd_btn:
-                    setQualityMode(EZConstants.EZVideoLevel.VIDEO_LEVEL_HD);
-                    break;
-                case R.id.quality_balanced_btn:
-                    setQualityMode(EZConstants.EZVideoLevel.VIDEO_LEVEL_BALANCED);
-                    break;
-                case R.id.quality_flunet_btn:
-                    setQualityMode(EZConstants.EZVideoLevel.VIDEO_LEVEL_FLUNET);
-                    break;
+//                case R.id.quality_hd_btn:
+//                    setQualityMode(EZConstants.EZVideoLevel.VIDEO_LEVEL_HD);
+//                    break;
+//                case R.id.quality_balanced_btn:
+//                    setQualityMode(EZConstants.EZVideoLevel.VIDEO_LEVEL_BALANCED);
+//                    break;
+//                case R.id.quality_flunet_btn:
+//                    setQualityMode(EZConstants.EZVideoLevel.VIDEO_LEVEL_FLUNET);
+//                    break;
                 case R.id.ptz_close_btn:
                     closePtzPopupWindow();
                     break;

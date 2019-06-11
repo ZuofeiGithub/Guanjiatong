@@ -129,6 +129,14 @@
         android:orientation="vertical">
 
         <ImageButton
+            android:layout_width="@dimen/dp_40"
+            android:layout_height="@dimen/dp_40"
+            android:background="@android:color/transparent"
+            android:scaleType="fitXY"
+            android:layout_marginBottom="@dimen/dp_5"
+            android:src="@drawable/icon_search" />
+
+        <ImageButton
             android:id="@+id/create_project"
             android:layout_width="@dimen/dp_40"
             android:layout_height="@dimen/dp_40"
