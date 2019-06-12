@@ -68,6 +68,7 @@ import com.videogo.exception.BaseException;
 import com.videogo.exception.ErrorCode;
 import com.videogo.exception.InnerException;
 import com.videogo.openapi.EZConstants;
+import com.videogo.openapi.EZOpenSDKListener;
 import com.videogo.openapi.EZPlayer;
 import com.videogo.openapi.bean.EZCameraInfo;
 import com.videogo.openapi.bean.EZDeviceInfo;
@@ -86,7 +87,6 @@ import com.videogo.widget.RingView;
 import com.videogo.widget.TitleBar;
 
 import java.util.Calendar;
-import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -1435,7 +1435,7 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
                 onCapturePicBtnClick();
                 break;
             case R.id.realplay_capture_rl:
-                //onCaptureRlClick();
+                onCaptureRlClick();
                 break;
             case R.id.realplay_video_btn:
             case R.id.realplay_video_start_btn:
@@ -1443,16 +1443,16 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
             case R.id.realplay_video_start_btn2:
             case R.id.realplay_full_video_btn:
             case R.id.realplay_full_video_start_btn:
-                //onRecordBtnClick();
+                onRecordBtnClick();
                 break;
             case R.id.realplay_talk_btn:
             case R.id.realplay_talk_btn2:
             case R.id.realplay_full_talk_btn:
-                //startVoiceTalk();
+                startVoiceTalk();
                 break;
 
             case R.id.realplay_quality_btn:
-                //openQualityPopupWindow(mRealPlayQualityBtn);
+                openQualityPopupWindow(mRealPlayQualityBtn);
                 break;
             case R.id.realplay_ptz_btn:
             case R.id.realplay_ptz_btn2:
@@ -1466,7 +1466,7 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
                 break;
             case R.id.realplay_sound_btn:
             case R.id.realplay_full_sound_btn:
-                //onSoundBtnClick();
+                onSoundBtnClick();
                 break;
             case R.id.realplay_full_talk_anim_btn:
                 closeTalkPopupWindow(true, true);
@@ -1474,6 +1474,223 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
             default:
                 break;
         }
+    }
+
+    private void openQualityPopupWindow(View anchor) {
+        if (mEZPlayer == null) {
+            return;
+        }
+        closeQualityPopupWindow();
+        LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        ViewGroup layoutView = (ViewGroup) layoutInflater.inflate(R.layout.realplay_quality_items, null, true);
+
+        Button qualityHdBtn = (Button) layoutView.findViewById(R.id.quality_hd_btn);
+        qualityHdBtn.setOnClickListener(mOnPopWndClickListener);
+        Button qualityBalancedBtn = (Button) layoutView.findViewById(R.id.quality_balanced_btn);
+        qualityBalancedBtn.setOnClickListener(mOnPopWndClickListener);
+        Button qualityFlunetBtn = (Button) layoutView.findViewById(R.id.quality_flunet_btn);
+        qualityFlunetBtn.setOnClickListener(mOnPopWndClickListener);
+
+        // 视频质量，2-高清，1-标清，0-流畅
+        //Video quality, 2-HD, 1-standard, 0- smooth
+        if (mCameraInfo.getVideoLevel() == EZConstants.EZVideoLevel.VIDEO_LEVEL_FLUNET) {
+            qualityFlunetBtn.setEnabled(false);
+        } else if (mCameraInfo.getVideoLevel() == EZConstants.EZVideoLevel.VIDEO_LEVEL_BALANCED) {
+            qualityBalancedBtn.setEnabled(false);
+        } else if (mCameraInfo.getVideoLevel() == EZConstants.EZVideoLevel.VIDEO_LEVEL_HD) {
+            qualityHdBtn.setEnabled(false);
+        }
+
+        int height = 105;
+
+        qualityFlunetBtn.setVisibility(View.VISIBLE);
+        qualityBalancedBtn.setVisibility(View.VISIBLE);
+        qualityHdBtn.setVisibility(View.VISIBLE);
+
+        height = Utils.dip2px(this, height);
+        mQualityPopupWindow = new PopupWindow(layoutView, RelativeLayout.LayoutParams.WRAP_CONTENT, height, true);
+        mQualityPopupWindow.setBackgroundDrawable(new BitmapDrawable());
+        mQualityPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+
+            @Override
+            public void onDismiss() {
+                LogUtil.infoLog(TAG, "KEYCODE_BACK DOWN");
+                mQualityPopupWindow = null;
+                closeQualityPopupWindow();
+            }
+        });
+        try {
+            mQualityPopupWindow.showAsDropDown(anchor, -Utils.dip2px(this, 5),
+                    -(height + anchor.getHeight() + Utils.dip2px(this, 8)));
+        } catch (Exception e) {
+            e.printStackTrace();
+            closeQualityPopupWindow();
+        }
+    }
+
+    private void onRecordBtnClick() {
+        mControlDisplaySec = 0;
+        if (mIsRecording) {
+            stopRealPlayRecord();
+            return;
+        }
+
+        if (!SDCardUtil.isSDCardUseable()) {
+            // 提示SD卡不可用
+            //Prompt SD card is not available
+            Utils.showToast(SiteLiveActivity.this, R.string.remoteplayback_SDCard_disable_use);
+            return;
+        }
+
+        if (SDCardUtil.getSDCardRemainSize() < SDCardUtil.PIC_MIN_MEM_SPACE) {
+            // 提示内存不足
+            //Prompt for insufficient memory
+            Utils.showToast(SiteLiveActivity.this, R.string.remoteplayback_record_fail_for_memory);
+            return;
+        }
+
+        if (mEZPlayer != null) {
+            mCaptureDisplaySec = 4;
+            updateCaptureUI();
+
+            mAudioPlayUtil.playAudioFile(AudioPlayUtil.RECORD_SOUND);
+
+            // 可以采用deviceSerial+时间作为文件命名，demo中简化，只用时间命名
+            //You can use deviceSerial + time as a file name, demo simplified, only time named
+            java.util.Date date = new java.util.Date();
+            final String strRecordFile = Environment.getExternalStorageDirectory().getPath() + "/EZOpenSDK/Records/" + String.format("%tY", date)
+                    + String.format("%tm", date) + String.format("%td", date) + "/"
+                    + String.format("%tH", date) + String.format("%tM", date) + String.format("%tS", date) + String.format("%tL", date) + ".mp4";
+
+            mEZPlayer.setStreamDownloadCallback(new EZOpenSDKListener.EZStreamDownloadCallback() {
+                @Override
+                public void onSuccess(String filepath) {
+                    LogUtil.infoLog(TAG, "EZStreamDownloadCallback onSuccess "+filepath);
+
+                }
+
+                @Override
+                public void onError(EZOpenSDKListener.EZStreamDownloadError code) {
+
+                }
+
+            });
+            if(mEZPlayer.startLocalRecordWithFile(strRecordFile)){
+                handleRecordSuccess(strRecordFile);
+            }else{
+                handleRecordFail();
+            }
+        }
+    }
+
+    private void handleRecordSuccess(String recordFilePath) {
+        if (mCameraInfo == null) {
+            return;
+        }
+
+        if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
+            if (!mIsOnStop) {
+                mRecordRotateViewUtil.applyRotation(mRealPlayRecordContainer, mRealPlayRecordBtn,
+                        mRealPlayRecordStartBtn, 0, 90);
+            } else {
+                mRealPlayRecordBtn.setVisibility(View.GONE);
+                mRealPlayRecordStartBtn.setVisibility(View.VISIBLE);
+            }
+            mRealPlayFullRecordBtn.setVisibility(View.GONE);
+            mRealPlayFullRecordStartBtn.setVisibility(View.VISIBLE);
+        } else {
+            if (!mIsOnStop) {
+                mRecordRotateViewUtil.applyRotation(mRealPlayFullRecordContainer, mRealPlayFullRecordBtn,
+                        mRealPlayFullRecordStartBtn, 0, 90);
+            } else {
+                mRealPlayFullRecordBtn.setVisibility(View.GONE);
+                mRealPlayFullRecordStartBtn.setVisibility(View.VISIBLE);
+            }
+            mRealPlayRecordBtn.setVisibility(View.GONE);
+            mRealPlayRecordStartBtn.setVisibility(View.VISIBLE);
+        }
+        mIsRecording = true;
+        mRealPlayRecordLy.setVisibility(View.VISIBLE);
+        mRealPlayRecordTv.setText("00:00");
+        mRecordSecond = 0;
+    }
+
+    private void handleRecordFail() {
+        Utils.showToast(SiteLiveActivity.this, R.string.remoteplayback_record_fail);
+        if (mIsRecording) {
+            stopRealPlayRecord();
+        }
+    }
+    private void onCaptureRlClick() {
+    }
+    private void onSoundBtnClick() {
+        if (mLocalInfo.isSoundOpen()) {
+            mLocalInfo.setSoundOpen(false);
+            mRealPlaySoundBtn.setBackgroundResource(R.drawable.ezopen_vertical_preview_sound_off_selector);
+            if (mRealPlayFullSoundBtn != null) {
+                mRealPlayFullSoundBtn.setBackgroundResource(R.drawable.play_full_soundoff_btn_selector);
+            }
+        } else {
+            mLocalInfo.setSoundOpen(true);
+            mRealPlaySoundBtn.setBackgroundResource(R.drawable.ezopen_vertical_preview_sound_selector);
+            if (mRealPlayFullSoundBtn != null) {
+                mRealPlayFullSoundBtn.setBackgroundResource(R.drawable.play_full_soundon_btn_selector);
+            }
+        }
+
+        setRealPlaySound();
+    }
+
+
+    /**
+     * 开启对讲
+     */
+    private void startVoiceTalk() {
+        LogUtil.debugLog(TAG, "startVoiceTalk");
+        if (mEZPlayer == null) {
+            LogUtil.debugLog(TAG, "EZPlaer is null");
+            return;
+        }
+        if (mCameraInfo == null) {
+            return;
+        }
+        mIsOnTalk = true;
+
+        updateOrientation();
+        Utils.showToast(this, R.string.start_voice_talk);
+        mRealPlayTalkBtn.setEnabled(false);
+        mRealPlayFullTalkBtn.setEnabled(false);
+        mRealPlayFullTalkAnimBtn.setEnabled(false);
+        if (mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mRealPlayFullAnimBtn.setBackgroundResource(R.drawable.speech_1);
+            mRealPlayFullTalkBtn.getLocationInWindow(mStartXy);
+            mEndXy[0] = Utils.dip2px(this, 20);
+            mEndXy[1] = mStartXy[1];
+            startFullBtnAnim(mRealPlayFullAnimBtn, mStartXy, mEndXy, new Animation.AnimationListener() {
+
+                @Override
+                public void onAnimationStart(Animation animation) {
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    Utils.showToast(SiteLiveActivity.this, R.string.realplay_full_talk_start_tip);
+                    mRealPlayFullTalkAnimBtn.setVisibility(View.VISIBLE);
+                    mRealPlayFullAnimBtn.setVisibility(View.GONE);
+                    onRealPlaySvClick();
+                    //                    mFullscreenFullButton.setVisibility(View.VISIBLE);
+                }
+            });
+        }
+
+        if (mEZPlayer != null) {
+            mEZPlayer.closeSound();
+        }
+        mEZPlayer.startVoiceTalk();
     }
     private void onCapturePicBtnClick() {
 
@@ -2085,15 +2302,15 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
-//                case R.id.quality_hd_btn:
-//                    setQualityMode(EZConstants.EZVideoLevel.VIDEO_LEVEL_HD);
-//                    break;
-//                case R.id.quality_balanced_btn:
-//                    setQualityMode(EZConstants.EZVideoLevel.VIDEO_LEVEL_BALANCED);
-//                    break;
-//                case R.id.quality_flunet_btn:
-//                    setQualityMode(EZConstants.EZVideoLevel.VIDEO_LEVEL_FLUNET);
-//                    break;
+                case R.id.quality_hd_btn:
+                    setQualityMode(EZConstants.EZVideoLevel.VIDEO_LEVEL_HD);
+                    break;
+                case R.id.quality_balanced_btn:
+                    setQualityMode(EZConstants.EZVideoLevel.VIDEO_LEVEL_BALANCED);
+                    break;
+                case R.id.quality_flunet_btn:
+                    setQualityMode(EZConstants.EZVideoLevel.VIDEO_LEVEL_FLUNET);
+                    break;
                 case R.id.ptz_close_btn:
                     closePtzPopupWindow();
                     break;

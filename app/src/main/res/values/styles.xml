@@ -115,4 +115,5 @@
         <item name="android:windowEnterAnimation">@anim/fade_up</item>
         <item name="android:windowExitAnimation">@anim/fade_down</item>
     </style>
+
 </resources>

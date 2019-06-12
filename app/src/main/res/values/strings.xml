@@ -24,4 +24,11 @@
     <string name="remoteplayback_SDCard_disable_use">存储卡不可用</string>
     <string name="remoteplayback_capture_fail_for_memory">抓图失败,存储空间已满</string>
     <string name="already_saved_to_volume">已保存至相册</string>
+    <string name="start_voice_talk">正在发起对讲</string>
+    <string name="realplay_full_talk_start_tip">你可以开始说话了</string>
+    <string name="remoteplayback_record_fail_for_memory">录像中断,存储空间已满</string>
+    <string name="remoteplayback_record_fail">录像失败</string>
+    <string name="quality_hd">高清</string>
+    <string name="quality_balanced">均衡</string>
+    <string name="quality_flunet">流畅</string>
 </resources>

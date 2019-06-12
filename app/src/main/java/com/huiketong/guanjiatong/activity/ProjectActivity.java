@@ -82,14 +82,14 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
     private String projectcode, projectname, housenumber;
     private int projectstatus;
     private EZDeviceInfo deviceInfo;
-
+    private List<EZDeviceInfo> deviceInfoList;
     private String userCode;
     private Handler bannerHandler;
     private int currBannerIndex = 0;
     private int code_result = 0;
     private ProjectTeamUserBean projectTeamUserBean;
     private String[] modules = {
-//            "760748040ad343b79d19c63c9b7556e4", //基础信息
+//            "760748040ad343b79d19c63c9b7556e4",     //基础信息
 //            "c4e67adb-183a-41b8-a0e4-6c93ef88b388", //每日签到
 //            "4f0006a7-5a6d-4024-93ec-8ddcb8682ae6", //设计档案
 //            "24e1df93-aef8-4661-bf5a-8da65e60ee3e", //施工任务
@@ -102,9 +102,10 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
 //            "872e9cb2-cbbf-4c68-9786-6167b1709a83", //我的收入
 //            "92b1259f-1b4c-48ea-8bd7-c822c71167dc", //申请延期
 //            "2cbad1a3-7ea5-408c-9321-20fac2e029d4", //延期审核
-            "65582869dece4dad8f1ce280be867467", //工地直播
+              "65582869dece4dad8f1ce280be867467",     //工地直播
 //            "da41230e-b26f-4e63-907b-63f2b28a279c", //处罚
     };
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -158,6 +159,8 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
         getPresenter().getModule(userCode);
         //获取设备信息
         getPresenter().getDeviceInfo(projectcode);
+        getDDNSDeviceListInfoList(true);
+        deviceInfoList = new ArrayList<>();
     }
 
     @Override
@@ -264,8 +267,8 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
     public void getModuleSuccess(final ModuleBean bean) {
         List list = Arrays.asList(modules);
         //数据过滤
-        for (int i = bean.getRows().size()-1;i >= 0;i--){
-            if(!list.contains(bean.getRows().get(i).getFrontmodulecode())){
+        for (int i = bean.getRows().size() - 1; i >= 0; i--) {
+            if (!list.contains(bean.getRows().get(i).getFrontmodulecode())) {
                 bean.getRows().remove(i);
             }
         }
@@ -278,7 +281,7 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
             @Override
             public void onItemClick(int position) {
                 Intent intent = null;
-                switch (bean.getRows().get(position).getFrontmodulecode()){
+                switch (bean.getRows().get(position).getFrontmodulecode()) {
                     case "760748040ad343b79d19c63c9b7556e4":    //TODO 基础信息
 
                         break;
@@ -319,18 +322,33 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
 
                         break;
                     case "65582869dece4dad8f1ce280be867467":    //工地直播
-                        getDDNSDeviceListInfoList(true);
-                        intent = new Intent(ProjectActivity.this,SiteLiveActivity.class);
-
-                        intent.putExtra(IntentConsts.EXTRA_DEVICE_INFO,deviceInfo);
+                        intent = new Intent(ProjectActivity.this, SiteLiveActivity.class);
+                        for (EZDeviceInfo info : deviceInfoList) {
+                            if (deviceInfo.getDeviceSerial().equals(info.getDeviceSerial())) {
+                                deviceInfo = info;
+                            }
+                        }
+                        if (deviceInfo.getCameraNum() <= 0 || deviceInfo.getCameraInfoList() == null || deviceInfo.getCameraInfoList().size() <= 0) {
+                            LogUtil.d("zuofei", "cameralist is null or cameralist size is 0");
+                            return;
+                        }
+                        if (deviceInfo.getCameraNum() == 1 && deviceInfo.getCameraInfoList() != null && deviceInfo.getCameraInfoList().size() == 1) {
+                            LogUtil.d("zuofei", "cameralist have one camera");
+                            final EZCameraInfo cameraInfo = EZUtils.getCameraInfoFromDevice(deviceInfo, 0);
+                            if (cameraInfo == null) {
+                                return;
+                            }
+                            intent.putExtra(IntentConsts.EXTRA_CAMERA_INFO, cameraInfo);
+                            intent.putExtra(IntentConsts.EXTRA_DEVICE_INFO, deviceInfo);
+                        }
                         code_result = 300;
                         break;
                     case "da41230e-b26f-4e63-907b-63f2b28a279c":    //TODO 处罚
 
                         break;
                 }
-                if(intent != null){
-                    startActivityForResult(intent,code_result);
+                if (intent != null) {
+                    startActivityForResult(intent, code_result);
                 }
             }
         });
@@ -345,9 +363,13 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
 
 
     }
+
+
     private class GetDDNSDeviceListInfoListTask extends AsyncTask<Void, Void, List<EZDeviceInfo>> {
         private boolean mHeaderOrFooter;
         private int mErrorCode = 0;
+        private OnDataFinishedListener onDataFinishedListener;
+
         public GetDDNSDeviceListInfoListTask(boolean headerOrFooter) {
             mHeaderOrFooter = headerOrFooter;
         }
@@ -372,7 +394,15 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
                 try {
                     List<EZDeviceInfo> result = null;
                     result = EZOpenSDK.getInstance().getDeviceList(0, 10);
-                    return result;
+                    if (result != null) {
+                        deviceInfoList.clear();
+                        if (result.size() > 0) {
+                            for (EZDeviceInfo info : result) {
+                                deviceInfoList.add(info);
+                            }
+                        }
+                        return result;
+                    }
                 } catch (BaseException e) {
                     ErrorInfo errorInfo = (ErrorInfo) e.getObject();
                     mErrorCode = errorInfo.errorCode;
@@ -403,15 +433,6 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
                     break;
             }
         }
-    }
-
-
-    public interface OnDataFinishedListener {
-
-        public void onDataSuccessfully(Object data);
-
-        public void onDataFailed();
-
     }
 
 }
