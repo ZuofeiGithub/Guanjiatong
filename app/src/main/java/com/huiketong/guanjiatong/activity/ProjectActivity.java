@@ -1,6 +1,7 @@
 package com.huiketong.guanjiatong.activity;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -10,6 +11,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -26,16 +28,27 @@ import com.huiketong.guanjiatong.bean.ProjectInfoBean;
 import com.huiketong.guanjiatong.bean.ProjectTeamUserBean;
 import com.huiketong.guanjiatong.myview.RoundCornerImageView;
 import com.huiketong.guanjiatong.presenter.ProjectPresenter;
+import com.huiketong.guanjiatong.utils.EZUtils;
 import com.huiketong.guanjiatong.utils.UrlUtils;
 import com.huiketong.guanjiatong.utils.Utils;
 import com.huiketong.guanjiatong.view.ProjectView;
 import com.orhanobut.logger.Logger;
 import com.squareup.picasso.Picasso;
 import com.videogo.constant.IntentConsts;
+import com.videogo.errorlayer.ErrorInfo;
+import com.videogo.exception.BaseException;
+import com.videogo.exception.ErrorCode;
+import com.videogo.openapi.EZGlobalSDK;
+import com.videogo.openapi.EZOpenSDK;
+import com.videogo.openapi.bean.EZCameraInfo;
 import com.videogo.openapi.bean.EZDeviceInfo;
+import com.videogo.openapi.bean.EZHiddnsDeviceInfo;
+import com.videogo.util.ConnectionDetector;
+import com.videogo.util.LogUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -306,7 +319,9 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
 
                         break;
                     case "65582869dece4dad8f1ce280be867467":    //工地直播
+                        getDDNSDeviceListInfoList(true);
                         intent = new Intent(ProjectActivity.this,SiteLiveActivity.class);
+
                         intent.putExtra(IntentConsts.EXTRA_DEVICE_INFO,deviceInfo);
                         code_result = 300;
                         break;
@@ -321,4 +336,82 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
         });
         tools.setAdapter(adapter);
     }
+
+    private void getDDNSDeviceListInfoList(boolean headerOrFooter) {
+        if (this.isFinishing()) {
+            return;
+        }
+        new GetDDNSDeviceListInfoListTask(headerOrFooter).execute();
+
+
+    }
+    private class GetDDNSDeviceListInfoListTask extends AsyncTask<Void, Void, List<EZDeviceInfo>> {
+        private boolean mHeaderOrFooter;
+        private int mErrorCode = 0;
+        public GetDDNSDeviceListInfoListTask(boolean headerOrFooter) {
+            mHeaderOrFooter = headerOrFooter;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //mListView.setFooterRefreshEnabled(true);
+        }
+
+        @Override
+        protected List<EZDeviceInfo> doInBackground(Void... params) {
+            if (ProjectActivity.this.isFinishing()) {
+                return null;
+            }
+            if (!ConnectionDetector.isNetworkAvailable(ProjectActivity.this)) {
+                mErrorCode = ErrorCode.ERROR_WEB_NET_EXCEPTION;
+                return null;
+            }
+
+            if (EZOpenSDK.getInstance() != null) {
+                try {
+                    List<EZDeviceInfo> result = null;
+                    result = EZOpenSDK.getInstance().getDeviceList(0, 10);
+                    return result;
+                } catch (BaseException e) {
+                    ErrorInfo errorInfo = (ErrorInfo) e.getObject();
+                    mErrorCode = errorInfo.errorCode;
+                    LogUtil.debugLog("zuofei", errorInfo.toString());
+
+                    return null;
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(List<EZDeviceInfo> result) {
+            super.onPostExecute(result);
+            if (ProjectActivity.this.isFinishing()) {
+                return;
+            }
+            if (mErrorCode != 0) {
+                onError(mErrorCode);
+            }
+        }
+
+        protected void onError(int errorCode) {
+            switch (errorCode) {
+                case ErrorCode.ERROR_WEB_SESSION_ERROR:
+                case ErrorCode.ERROR_WEB_SESSION_EXPIRE:
+                default:
+                    break;
+            }
+        }
+    }
+
+
+    public interface OnDataFinishedListener {
+
+        public void onDataSuccessfully(Object data);
+
+        public void onDataFailed();
+
+    }
+
 }

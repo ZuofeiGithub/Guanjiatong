@@ -19,10 +19,14 @@ public class MainApplication extends Application {
     //是否是调试模式
     private boolean isDebug = true;
     public static MainApplication mainApplication;
+    private final static int TYPE_OPENSDK = 1;
+    private final static int TYPE_GLOABL_OPENSDK = 2;
 
+    private final static int TYPE = TYPE_OPENSDK;
     public static String AppKey = "9e53b2561f314f00ba68b5d58d66e4c0";
     public static String API_URL;
     public static String WEB_URL;
+    public static String APP_SECRETE;
     public static String APP_PUSH_SECRETE;
     public static EZOpenSDK getOpenSDK() {
         return EZOpenSDK.getInstance();
@@ -54,7 +58,11 @@ public class MainApplication extends Application {
         });
 
         mainApplication = this;
-        initSDK();
+        if (TYPE == TYPE_GLOABL_OPENSDK) {
+            initGlobalSDK();
+        } else if (TYPE == TYPE_OPENSDK) {
+            initSDK();
+        }
         EzvizAPI.getInstance().setServerUrl(API_URL, WEB_URL);
         /**
          * 如果需要推送服务，需要再初始化EZOpenSDK后，调用以下方法初始化推送服务
@@ -122,17 +130,79 @@ public class MainApplication extends Application {
 
             //EZOpenSDK.initLib(this, "fecf30f4a8754e8bbe4fbcfab2011802");
             //
-            //EZOpenSDK.getInstance().setAccessToken("at.8x4g5b7v1s96dnmd0gs2ulf77ap2o8c1-2kpax44vvt-1r3swy6-qc54sro0d");
+            EZOpenSDK.getInstance().setAccessToken("at.atg78tf04q3nva425wf1dlyla80ond1m-1738b6jt2e-1i9afqv-1rivzqgfv");
         }
 
     }
 
+    private void initGlobalSDK() {
+        /**********海外版本初始化EZGlobalSDK**************/
+        {
+            initGlobalParam();
+            /**
+             * sdk日志开关，正式发布需要去掉
+             */
+            EZGlobalSDK.showSDKLog(true);
+
+            /**
+             * 设置是否支持P2P取流,详见api
+             */
+            EZGlobalSDK.enableP2P(true);
+            /**
+             * APP_KEY请替换成自己申请的
+             */
+            EZGlobalSDK.initLib(this, AppKey, "");
+        }
+    }
+
+    private void initGlobalParam() {
+        //海外测试
+        AppKey = "f23c52801b504675881c0db0efa456d8";
+        APP_SECRETE = "51e4d82aa48fd4af979bf47d8c63af84";
+        API_URL = "https://itcnopen.ezvizlife.com:9443";
+        WEB_URL = "https://itcnopenauth.ezvizlife.com:9543";
+        APP_PUSH_SECRETE = "090f0094-1d46-4862-8017-89a40188ce32";
+
+        //海外正式平台
+        AppKey = "6394bd89638111e6876d0cc47a41de4e";
+        APP_SECRETE = "a7b31531638111e6876d0cc47a41de4e";
+        API_URL = "https://iusopen.ezvizlife.com";
+        WEB_URL = "https://iusopenauth.ezvizlife.com";
+        APP_PUSH_SECRETE = "311979bb-6d89-490c-b89b-ca7669ab8fba";
+
+        // 北美海外正式平台
+        //    AppKey = "8c2f7387ad7a11e6876d0cc47a41de4e";
+        //    AppKey = "bd8f6f049ca049c0ad32776e7f745180";
+        //    APP_SECRETE = "a7b31531638111e6876d0cc47a41de4e";
+        //    API_URL = "https://iusopen.ezvizlife.com";
+        //    WEB_URL = "https://iusopenauth.ezvizlife.com";
+        //    APP_PUSH_SECRETE = "05bb7777-025a-4a81-9302-9954344b971f";
+
+        //新加坡海外正式平台
+        //AppKey = "f3bbdc3115f311e7adacfa163eedb34f";
+//        APP_SECRETE = "a7b31531638111e6876d0cc47a41de4e";
+//        API_URL = "https://iusopen.ezvizlife.com";
+//        WEB_URL = "https://iusopenauth.ezvizlife.com";
+//        APP_PUSH_SECRETE = "05bb7777-025a-4a81-9302-9954344b971f";
+
+        //AppKey = "0506e44cb1ef11e690d952540059e058";
+
+        //伏羲
+        //AppKey = "ae1b9af9dcac4caeb88da6dbbf2dd8d5";
+        //APP_SECRETE = "a7b31531638111e6876d0cc47a41de4e";
+        //API_URL = "http://ifuxi.open.ezvizlife.com:8080";
+        //WEB_URL = "http://ifuxi.oauth.ezvizlife.com:8080";
+        //APP_PUSH_SECRETE = "311979bb-6d89-490c-b89b-ca7669ab8fba";
+
+        AppKey = "52966fc7efe84fa8ad3c0b2b2e3effdd";
+    }
+
     private void initParam() {
         //线上测试推送
-        AppKey = "26810f3acd794862b608b6cfbc32a6b8";
+        AppKey = "9e53b2561f314f00ba68b5d58d66e4c0";
         API_URL = "https://open.ys7.com";
         WEB_URL = "https://auth.ys7.com";
-        APP_PUSH_SECRETE = "a88256b1-65d4-4cb3-9ac4-8b08a56ad07d";
+        APP_PUSH_SECRETE = "34874f1bdd964b7fa822c2117f3b451d";
 
         //AppKey = "81372ec4f0a4483ea39620c88512ea9c";
 
