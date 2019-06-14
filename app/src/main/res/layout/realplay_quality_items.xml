@@ -12,6 +12,7 @@
         android:id="@+id/quality_hd_btn"
         android:layout_width="wrap_content"
         android:layout_height="28dp"
+        android:layout_marginBottom="13dp"
         android:background="@color/transparent"
         android:text="@string/quality_hd"
         android:textColor="@color/quality_color_selector"
@@ -20,7 +21,7 @@
     <Button
         android:id="@+id/quality_balanced_btn"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="28dp"
         android:layout_marginBottom="13dp"
         android:text="@string/quality_balanced"
         android:textColor="@color/quality_color_selector"
@@ -30,7 +31,7 @@
     <Button
         android:id="@+id/quality_flunet_btn"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="28dp"
         android:layout_marginBottom="13dp"
         android:text="@string/quality_flunet"
         android:textColor="@color/quality_color_selector"

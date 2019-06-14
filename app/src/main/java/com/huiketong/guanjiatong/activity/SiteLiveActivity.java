@@ -2011,7 +2011,7 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
             mRealPlayFullPtzBtn.setEnabled(true);
         }
 
-//        setRealPlaySound();
+        //setRealPlaySound();
 
         startUpdateTimer();
     }

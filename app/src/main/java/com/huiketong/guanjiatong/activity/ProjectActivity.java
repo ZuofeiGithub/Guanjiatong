@@ -122,7 +122,7 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
             finish();
         }
         initView();
-        initDate();
+        initData();
 
     }
 
@@ -147,7 +147,7 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
         tvState.setText(statusName);
     }
 
-    private void initDate() {
+    private void initData() {
         userCode = (String) Utils.getShared(this, "usercode", "");
         // 获取banner图
         getPresenter().getBannerByUserCode(userCode);
@@ -237,6 +237,11 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
     @Override
     public void getDeviceInfoSuccess(EZDeviceInfo bean) {
         deviceInfo = bean;
+        for (EZDeviceInfo info : deviceInfoList) {
+            if (deviceInfo.getDeviceSerial().equals(info.getDeviceSerial())) {
+                deviceInfo = info;
+            }
+        }
     }
 
     @Override
@@ -272,6 +277,7 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
                 bean.getRows().remove(i);
             }
         }
+
         //创建网格布局
         GridLayoutManager manager = new GridLayoutManager(this, 4);
         manager.setSmoothScrollbarEnabled(false);
@@ -322,12 +328,8 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
 
                         break;
                     case "65582869dece4dad8f1ce280be867467":    //工地直播
-                        intent = new Intent(ProjectActivity.this, SiteLiveActivity.class);
-                        for (EZDeviceInfo info : deviceInfoList) {
-                            if (deviceInfo.getDeviceSerial().equals(info.getDeviceSerial())) {
-                                deviceInfo = info;
-                            }
-                        }
+                        intent = new Intent(ProjectActivity.this,EZRealPlayActivity.class);
+
                         if (deviceInfo.getCameraNum() <= 0 || deviceInfo.getCameraInfoList() == null || deviceInfo.getCameraInfoList().size() <= 0) {
                             LogUtil.d("zuofei", "cameralist is null or cameralist size is 0");
                             return;
