@@ -94,7 +94,7 @@ public class ModuleAdapter extends RecyclerView.Adapter<ModuleAdapter.Holder> {
     // 利用接口 -> 给RecyclerView设置点击事件
     private ItemClickListener mItemClickListener ;
     public interface ItemClickListener{
-        public void onItemClick(int position) ;
+         void onItemClick(int position) ;
     }
     public void setOnItemClickListener(ItemClickListener itemClickListener){
         this.mItemClickListener = itemClickListener ;
