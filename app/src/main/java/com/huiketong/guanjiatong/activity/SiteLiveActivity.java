@@ -252,6 +252,7 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
     private EZConstants.EZVideoLevel mCurrentQulityMode = EZConstants.EZVideoLevel.VIDEO_LEVEL_HD;
     private EZCameraInfo mCameraInfo = null;
     private EZDeviceInfo mDeviceInfo = null;
+    private String mProjectName;
     // 视频广场URL  Video Square URL
     private String mRtspUrl = null;
     private String mVerifyCode;
@@ -337,6 +338,7 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
         if (intent != null) {
             mCameraInfo = intent.getParcelableExtra(IntentConsts.EXTRA_CAMERA_INFO);
             mDeviceInfo = intent.getParcelableExtra(IntentConsts.EXTRA_DEVICE_INFO);
+            mProjectName = intent.getStringExtra("projectname");
             mRtspUrl = intent.getStringExtra(IntentConsts.EXTRA_RTSP_URL);
             if (mCameraInfo != null) {
                 mCurrentQulityMode = (mCameraInfo.getVideoLevel());
@@ -349,7 +351,7 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
             mVerifyCode = DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial());
         }
     }
-    // 等到播放器的信息
+    // 得到播放器的信息
     private void getRealPlaySquareInfo() {
         if (TextUtils.isEmpty(mRtspUrl)) {
             return;
@@ -2124,8 +2126,10 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
         mPageAnimDrawable = null;
         mRealPlaySoundBtn.setVisibility(View.VISIBLE);
         if (mCameraInfo != null) {
-            mPortraitTitleBar.setTitle(mCameraInfo.getCameraName());
-            mLandscapeTitleBar.setTitle(mCameraInfo.getCameraName());
+            //mPortraitTitleBar.setTitle(mCameraInfo.getCameraName());
+            mPortraitTitleBar.setTitle(mProjectName);
+            //mLandscapeTitleBar.setTitle(mCameraInfo.getCameraName());
+            mLandscapeTitleBar.setTitle(mProjectName);
             setCameraInfoTiletRightBtn();
             if (mLocalInfo.isSoundOpen()) {
                 mRealPlaySoundBtn.setBackgroundResource(R.drawable.selector_ez_vertical_preview_sound);

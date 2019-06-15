@@ -14,9 +14,12 @@ import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.huiketong.guanjiatong.R;
 import com.huiketong.guanjiatong.adapter.BannerAdapter;
@@ -30,6 +33,7 @@ import com.huiketong.guanjiatong.myview.RoundCornerImageView;
 import com.huiketong.guanjiatong.presenter.ProjectPresenter;
 import com.huiketong.guanjiatong.utils.EZUtils;
 import com.huiketong.guanjiatong.utils.UrlUtils;
+import com.huiketong.guanjiatong.utils.Utility;
 import com.huiketong.guanjiatong.utils.Utils;
 import com.huiketong.guanjiatong.view.ProjectView;
 import com.orhanobut.logger.Logger;
@@ -78,6 +82,8 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
     LinearLayout llTeam;
     @BindView(R.id.tools)
     RecyclerView tools;
+    @BindView(R.id.select_case)
+    ListView mSelectView;
 
     private String projectcode, projectname, housenumber;
     private int projectstatus;
@@ -89,21 +95,21 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
     private int code_result = 0;
     private ProjectTeamUserBean projectTeamUserBean;
     private String[] modules = {
-//            "760748040ad343b79d19c63c9b7556e4",     //基础信息
-//            "c4e67adb-183a-41b8-a0e4-6c93ef88b388", //每日签到
-//            "4f0006a7-5a6d-4024-93ec-8ddcb8682ae6", //设计档案
-//            "24e1df93-aef8-4661-bf5a-8da65e60ee3e", //施工任务
-//            "d01507f3-b7a3-4759-bac4-c000a8176bc4", //工程材料
-//            "90ea86e8-802c-4144-915f-838c3cc40bb6", //项目修改
-//            "eeee0b7c-4ed8-4423-b889-8a6108399249", //导入模板
-//            "f9ea2f70-c950-4951-9548-5914143c6976", //家装商城
-//            "0363d3ee-01fe-4d72-8e3f-9b6ed059f12d", //我的收藏
-//            "63a726a8-25d1-4fd5-87f6-5e25011c61cf", //添加案例
-//            "872e9cb2-cbbf-4c68-9786-6167b1709a83", //我的收入
-//            "92b1259f-1b4c-48ea-8bd7-c822c71167dc", //申请延期
-//            "2cbad1a3-7ea5-408c-9321-20fac2e029d4", //延期审核
+            "760748040ad343b79d19c63c9b7556e4",     //基础信息
+            "c4e67adb-183a-41b8-a0e4-6c93ef88b388", //每日签到
+            "4f0006a7-5a6d-4024-93ec-8ddcb8682ae6", //设计档案
+            "24e1df93-aef8-4661-bf5a-8da65e60ee3e", //施工任务
+            "d01507f3-b7a3-4759-bac4-c000a8176bc4", //工程材料
+            "90ea86e8-802c-4144-915f-838c3cc40bb6", //项目修改
+            "eeee0b7c-4ed8-4423-b889-8a6108399249", //导入模板
+            "f9ea2f70-c950-4951-9548-5914143c6976", //家装商城
+            "0363d3ee-01fe-4d72-8e3f-9b6ed059f12d", //我的收藏
+            "63a726a8-25d1-4fd5-87f6-5e25011c61cf", //添加案例
+            "872e9cb2-cbbf-4c68-9786-6167b1709a83", //我的收入
+            "92b1259f-1b4c-48ea-8bd7-c822c71167dc", //申请延期
+            "2cbad1a3-7ea5-408c-9321-20fac2e029d4", //延期审核
               "65582869dece4dad8f1ce280be867467",     //工地直播
-//            "da41230e-b26f-4e63-907b-63f2b28a279c", //处罚
+            "da41230e-b26f-4e63-907b-63f2b28a279c", //处罚
     };
 
     @Override
@@ -123,6 +129,8 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
         }
         initView();
         initData();
+
+
 
     }
 
@@ -161,6 +169,10 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
         getPresenter().getDeviceInfo(projectcode);
         getDDNSDeviceListInfoList(true);
         deviceInfoList = new ArrayList<>();
+        String[] data = {"陈东辉","左飞"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,data);
+        mSelectView.setAdapter(adapter);
+        Utility.setListViewHeightBasedOnChildren(mSelectView);
     }
 
     @Override
@@ -328,22 +340,29 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
 
                         break;
                     case "65582869dece4dad8f1ce280be867467":    //工地直播
-                        intent = new Intent(ProjectActivity.this,EZRealPlayActivity.class);
 
-                        if (deviceInfo.getCameraNum() <= 0 || deviceInfo.getCameraInfoList() == null || deviceInfo.getCameraInfoList().size() <= 0) {
-                            LogUtil.d("zuofei", "cameralist is null or cameralist size is 0");
-                            return;
-                        }
-                        if (deviceInfo.getCameraNum() == 1 && deviceInfo.getCameraInfoList() != null && deviceInfo.getCameraInfoList().size() == 1) {
-                            LogUtil.d("zuofei", "cameralist have one camera");
-                            final EZCameraInfo cameraInfo = EZUtils.getCameraInfoFromDevice(deviceInfo, 0);
-                            if (cameraInfo == null) {
+                        if(deviceInfo != null){
+                            intent = new Intent(ProjectActivity.this,SiteLiveActivity.class);
+                            if (deviceInfo.getCameraNum() <= 0 || deviceInfo.getCameraInfoList() == null || deviceInfo.getCameraInfoList().size() <= 0) {
+                                LogUtil.d("zuofei", "cameralist is null or cameralist size is 0");
                                 return;
                             }
-                            intent.putExtra(IntentConsts.EXTRA_CAMERA_INFO, cameraInfo);
-                            intent.putExtra(IntentConsts.EXTRA_DEVICE_INFO, deviceInfo);
+                            if (deviceInfo.getCameraNum() == 1 && deviceInfo.getCameraInfoList() != null && deviceInfo.getCameraInfoList().size() == 1) {
+                                LogUtil.d("zuofei", "cameralist have one camera");
+                                final EZCameraInfo cameraInfo = EZUtils.getCameraInfoFromDevice(deviceInfo, 0);
+                                if (cameraInfo == null) {
+                                    return;
+                                }
+                                intent.putExtra("projectname",projectname);
+                                intent.putExtra(IntentConsts.EXTRA_CAMERA_INFO, cameraInfo);
+                                intent.putExtra(IntentConsts.EXTRA_DEVICE_INFO, deviceInfo);
+                            }
+                            code_result = 300;
+                        }else{
+                            com.videogo.util.Utils.showToast(ProjectActivity.this, "该项目没有视频直播");
+                            return;
                         }
-                        code_result = 300;
+
                         break;
                     case "da41230e-b26f-4e63-907b-63f2b28a279c":    //TODO 处罚
 
