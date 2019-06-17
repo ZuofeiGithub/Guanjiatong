@@ -29,7 +29,7 @@
     <string name="remoteplayback_record_fail_for_memory">录像中断,存储空间已满</string>
     <string name="remoteplayback_record_fail">录像失败</string>
     <string name="quality_hd">高清</string>
-    <string name="quality_balanced">均衡</string>
+    <string name="quality_balanced">标清</string>
     <string name="quality_flunet">流畅</string>
     <string name="realplay_set_fail_network">设置失败，请检查您的网络</string>
     <string name="setting_video_level">正在设置画面质量…</string>

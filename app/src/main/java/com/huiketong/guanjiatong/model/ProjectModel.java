@@ -49,6 +49,24 @@ public class ProjectModel extends BaseModel {
     }
 
     /**
+     * 获得精选案例列表
+     * @param projectcode 项目ID
+     * @param userCode 用户
+     * @param p 当前页数
+     * @param ps 每页数量
+     * @param callback
+     */
+    public void GetCase(String projectcode,String userCode,String p,String ps,HttpCallback callback){
+        Map<String, String> params = new HashMap<>();
+        params.put("projectcode", projectcode);
+        params.put("userCode", userCode);
+        params.put("p", p);
+        params.put("ps", ps);
+
+        HttpUtils.getRequest(UrlUtils.GetCase, params, callback);
+    }
+
+    /**
      * 获取项目详情
      *
      * @param projectcode

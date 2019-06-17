@@ -6,6 +6,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.huiketong.guanjiatong.base.BasePresenter;
 import com.huiketong.guanjiatong.bean.BannerByUserCodeBean;
+import com.huiketong.guanjiatong.bean.CaseListBean;
 import com.huiketong.guanjiatong.bean.DeviceInfoResp;
 import com.huiketong.guanjiatong.bean.ModuleBean;
 import com.huiketong.guanjiatong.bean.ProjectInfoBean;
@@ -80,6 +81,34 @@ public class ProjectPresenter extends BasePresenter<ProjectView> {
                 result = HttpUtils.getJson(result);
                 ProjectInfoBean bean = new Gson().fromJson(result, ProjectInfoBean.class);
                 getView().getProjectInfoSuccess(bean);
+            }
+
+            @Override
+            public void requestFaild(Request request, IOException io) {
+
+            }
+
+            @Override
+            public void complete() {
+
+            }
+        });
+    }
+
+    /**
+     * 获得精选案例列表
+     * @param projectcode
+     * @param userCode
+     * @param p
+     * @param ps
+     */
+    public void getCaseList(String projectcode,String userCode,Integer p,Integer ps){
+        projectModel.GetCase(projectcode, userCode, String.valueOf(p), String.valueOf(ps), new HttpCallback() {
+            @Override
+            public void requestSuccess(String result) throws Exception {
+                result = HttpUtils.getJson(result);
+                CaseListBean bean = new Gson().fromJson(result,CaseListBean.class);
+                getView().getCaseInfoSuccess(bean);
             }
 
             @Override

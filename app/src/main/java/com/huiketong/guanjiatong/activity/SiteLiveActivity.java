@@ -1,5 +1,6 @@
 package com.huiketong.guanjiatong.activity;
 
+import android.Manifest;
 import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -18,11 +19,10 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -93,12 +93,17 @@ import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.OnShowRationale;
+import permissions.dispatcher.PermissionRequest;
+import permissions.dispatcher.RuntimePermissions;
 
 import static com.videogo.openapi.EZConstants.MSG_VIDEO_SIZE_CHANGED;
 
 /**
  * 工地直播
  */
+@RuntimePermissions
 public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresenter> implements SiteLiveView,
         Handler.Callback, SurfaceHolder.Callback, View.OnTouchListener, View.OnClickListener,VerifyCodeInput.VerifyCodeInputListener {
 
@@ -307,6 +312,7 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_site_live);
         ButterKnife.bind(this);
+        getPermission();
         initData();
         initView();
     }
@@ -657,6 +663,50 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
             }
             mControlDisplaySec = 0;
         }
+    }
+
+    @NeedsPermission(Manifest.permission.RECORD_AUDIO)
+    void recordAudio() {
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        SiteLiveActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+    }
+
+    @OnShowRationale(Manifest.permission.RECORD_AUDIO)
+    void recordAudioOnShow(final PermissionRequest request) {
+    }
+
+    void getAutioRecordPermission(){
+        SiteLiveActivityPermissionsDispatcher.recordAudioWithPermissionCheck(this);
+    }
+
+    void getStoragePermission(){
+
+        SiteLiveActivityPermissionsDispatcher.extenalStorageWithPermissionCheck(this);
+    }
+
+    @NeedsPermission({Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})
+    void extenalStorage() {
+    }
+
+    @OnShowRationale({Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})
+    void extenalStorageOnShow(final PermissionRequest request) {
+    }
+
+    @NeedsPermission({Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})
+    void audioStorage() {
+    }
+
+    @OnShowRationale({Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})
+    void audioStorageShow(final PermissionRequest request) {
+    }
+
+    void getPermission(){
+
+        SiteLiveActivityPermissionsDispatcher.audioStorageWithPermissionCheck(this);
     }
 
 
@@ -1503,7 +1553,7 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
             qualityHdBtn.setEnabled(false);
         }
 
-        int height = 105;
+        int height = 150;
 
         qualityFlunetBtn.setVisibility(View.VISIBLE);
         qualityBalancedBtn.setVisibility(View.VISIBLE);
@@ -1987,7 +2037,7 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
     // 设置播放器成功ui
     private void setRealPlaySuccessUI() {
         mStopTime = System.currentTimeMillis();
-        showType();
+        //showType();
 
         updateOrientation();
         setLoadingSuccess();
@@ -2641,7 +2691,7 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
 
     private void setRealPlayFailUI(String errorStr) {
         mStopTime = System.currentTimeMillis();
-        showType();
+        //showType();
 
         stopUpdateTimer();
         updateOrientation();

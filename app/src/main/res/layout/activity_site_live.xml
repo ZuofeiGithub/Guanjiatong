@@ -26,6 +26,7 @@
             android:layout_alignParentTop="true"
             android:layout_centerInParent="false"
             android:background="@android:color/transparent" />
+
         <include layout="@layout/realplay_loading_layout" />
         <!--
                 <include layout="@layout/realplay_control_layout" />

@@ -1,6 +1,7 @@
 package com.huiketong.guanjiatong.activity;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,6 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +28,7 @@ import com.huiketong.guanjiatong.adapter.BannerAdapter;
 import com.huiketong.guanjiatong.adapter.ModuleAdapter;
 import com.huiketong.guanjiatong.base.BaseActivity;
 import com.huiketong.guanjiatong.bean.BannerByUserCodeBean;
+import com.huiketong.guanjiatong.bean.CaseListBean;
 import com.huiketong.guanjiatong.bean.ModuleBean;
 import com.huiketong.guanjiatong.bean.ProjectInfoBean;
 import com.huiketong.guanjiatong.bean.ProjectTeamUserBean;
@@ -38,6 +41,8 @@ import com.huiketong.guanjiatong.utils.Utils;
 import com.huiketong.guanjiatong.view.ProjectView;
 import com.orhanobut.logger.Logger;
 import com.squareup.picasso.Picasso;
+import com.tencent.map.geolocation.TencentLocationManager;
+import com.tencent.map.geolocation.TencentLocationRequest;
 import com.videogo.constant.IntentConsts;
 import com.videogo.errorlayer.ErrorInfo;
 import com.videogo.exception.BaseException;
@@ -53,7 +58,9 @@ import com.videogo.util.LogUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -94,6 +101,7 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
     private int currBannerIndex = 0;
     private int code_result = 0;
     private ProjectTeamUserBean projectTeamUserBean;
+    public AppInfo appInfo;
     private String[] modules = {
             "760748040ad343b79d19c63c9b7556e4",     //基础信息
             "c4e67adb-183a-41b8-a0e4-6c93ef88b388", //每日签到
@@ -117,7 +125,15 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_project);
         ButterKnife.bind(this);
-
+        try {
+            appInfo = AppInfo.getAppInfo(this.getPackageManager().
+                    getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA).
+                    metaData.getString("TencentMapSDK"));
+        } catch (Exception e) {
+            // TODO: handle exception
+            Toast toast = Toast.makeText(this, "未找到key", Toast.LENGTH_LONG);
+            toast.show();
+        }
         Bundle bundle = getIntent().getExtras();
         projectcode = bundle.getString("projectcode");
         projectname = bundle.getString("projectname");
@@ -165,14 +181,33 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
         getPresenter().getTeamList(projectcode, 1, 100);
         // 获取功能列表
         getPresenter().getModule(userCode);
+        //获得精选案例列表
+        getPresenter().getCaseList(projectcode,userCode,1,100);
         //获取设备信息
         getPresenter().getDeviceInfo(projectcode);
         getDDNSDeviceListInfoList(true);
         deviceInfoList = new ArrayList<>();
-        String[] data = {"陈东辉","左飞"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,data);
-        mSelectView.setAdapter(adapter);
         Utility.setListViewHeightBasedOnChildren(mSelectView);
+    }
+
+
+    //获取key
+    public static class AppInfo {
+        private final String USER_KEY;
+        private static AppInfo appInfo;
+
+        private AppInfo(String key) {
+            USER_KEY = key;
+        }
+        public static AppInfo getAppInfo(String key) {
+            if (appInfo == null) {
+                appInfo = new AppInfo(key);
+            }
+            return appInfo;
+        }
+        public static String getAppkey() {
+            return appInfo.USER_KEY;
+        }
     }
 
     @Override
@@ -188,6 +223,7 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
     @OnClick(R.id.btn_team)
     public void onViewClicked() {
     }
+
 
     @Override
     public void onBannerSuccess(BannerByUserCodeBean bean) {
@@ -257,6 +293,14 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
     }
 
     @Override
+    public void getCaseInfoSuccess(CaseListBean bean) {
+        Log.i("zuofei",bean.getRows().toString());
+        List<Map<String,Object>> mapList = new ArrayList<>();
+        SimpleAdapter simpleAdapter = new SimpleAdapter(this,mapList,R.layout.select_case_item,new String[]{"","","",""},new int[]{R.id.select_case,1,1,1});
+        mSelectView.setAdapter(simpleAdapter);
+    }
+
+    @Override
     public void getTeamList(ProjectTeamUserBean bean) {
         if (bean.getRows().size() == 0) {
             return;
@@ -304,7 +348,7 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
 
                         break;
                     case "c4e67adb-183a-41b8-a0e4-6c93ef88b388":    //TODO 每日签到
-
+                        intent = new Intent(ProjectActivity.this,SignInActivity.class);
                         break;
                     case "4f0006a7-5a6d-4024-93ec-8ddcb8682ae6":    //TODO 设计档案
 

@@ -2,6 +2,7 @@ package com.huiketong.guanjiatong.view;
 
 import com.huiketong.guanjiatong.base.BaseView;
 import com.huiketong.guanjiatong.bean.BannerByUserCodeBean;
+import com.huiketong.guanjiatong.bean.CaseListBean;
 import com.huiketong.guanjiatong.bean.ModuleBean;
 import com.huiketong.guanjiatong.bean.ProjectInfoBean;
 import com.huiketong.guanjiatong.bean.ProjectTeamUserBean;
@@ -40,4 +41,7 @@ public interface ProjectView extends BaseView {
      * 获取设备信息
      */
     void getDeviceInfoSuccess(EZDeviceInfo bean);
+
+
+    void getCaseInfoSuccess(CaseListBean bean);
 }
