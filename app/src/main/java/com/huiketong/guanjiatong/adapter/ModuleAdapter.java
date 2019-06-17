@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.huiketong.guanjiatong.R;
 import com.huiketong.guanjiatong.bean.ModuleBean;
@@ -24,6 +25,7 @@ public class ModuleAdapter extends RecyclerView.Adapter<ModuleAdapter.Holder> {
 
     private Context context;
     private Map<String, Integer> icons;
+
 
     public ModuleAdapter(ModuleBean bean, Context context) {
         this.bean = bean;
@@ -48,12 +50,33 @@ public class ModuleAdapter extends RecyclerView.Adapter<ModuleAdapter.Holder> {
     }
 
 
+    /**
+     * 相当于getView方法中创建View和ViewHolder
+     * @param viewGroup
+     * @param i
+     * @return
+     */
     @NonNull
     @Override
     public Holder onCreateViewHolder(@NonNull ViewGroup viewGroup, final int i) {
         // 获取列表每行的布局文件
         View view = LayoutInflater.from(context).inflate(R.layout.list_tools_item, viewGroup, false);
         Holder holder = new Holder(view);
+        // 点击事件一般都写在绑定数据这里，当然写到上边的创建布局时候也是可以的
+        return holder;
+    }
+
+    /**
+     * 数据和View绑定
+     * @param holder
+     * @param i
+     */
+    @Override
+    public void onBindViewHolder(@NonNull Holder holder, final int i) {
+        holder.tv.setText(bean.getRows().get(i).getFrontmodulename());
+        if(icons.containsKey(bean.getRows().get(i).getFrontmoduleicon())){
+            holder.iv.setImageResource(icons.get(bean.getRows().get(i).getFrontmoduleicon()));
+        }
         // 点击事件一般都写在绑定数据这里，当然写到上边的创建布局时候也是可以的
         if (mItemClickListener != null){
             holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -64,18 +87,13 @@ public class ModuleAdapter extends RecyclerView.Adapter<ModuleAdapter.Holder> {
                 }
             });
         }
-        return holder;
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull Holder holder, int i) {
-        holder.tv.setText(bean.getRows().get(i).getFrontmodulename());
-        if(icons.containsKey(bean.getRows().get(i).getFrontmoduleicon())){
-            holder.iv.setImageResource(icons.get(bean.getRows().get(i).getFrontmoduleicon()));
-        }
     }
 
 
+    /**
+     * 得到总条数
+     * @return
+     */
     @Override
     public int getItemCount() {
         return bean.getRows().size();
