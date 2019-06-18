@@ -201,43 +201,45 @@ public class HomeFragment extends BaseFragment<HomeView, HomePresenter> implemen
             });*/
             list.add(imageView);
         }
-        banner.setAdapter(new BannerAdapter(list));
-        bannerHandler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                switch (msg.what) {
-                    case 2: //切换banner
-                        currBannerIndex += 1;
-                        if (currBannerIndex >= list.size()) {
-                            currBannerIndex = 0;
-                        }
-                        banner.setCurrentItem(currBannerIndex, true);
-                        break;
+        if(banner != null) {
+            banner.setAdapter(new BannerAdapter(list));
+            bannerHandler = new Handler() {
+                @Override
+                public void handleMessage(Message msg) {
+                    super.handleMessage(msg);
+                    switch (msg.what) {
+                        case 2: //切换banner
+                            currBannerIndex += 1;
+                            if (currBannerIndex >= list.size()) {
+                                currBannerIndex = 0;
+                            }
+                            banner.setCurrentItem(currBannerIndex, true);
+                            break;
+                    }
                 }
-            }
-        };
-        bannerHandler.sendEmptyMessageDelayed(2, 2500);
-        banner.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int i, float v, int i1) {
-                if (i != 0 && bannerHandler.hasMessages(2)) {
-                    bannerHandler.removeMessages(2);
+            };
+            bannerHandler.sendEmptyMessageDelayed(2, 2500);
+            banner.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageScrolled(int i, float v, int i1) {
+                    if (i != 0 && bannerHandler.hasMessages(2)) {
+                        bannerHandler.removeMessages(2);
+                    }
                 }
-            }
 
-            @Override
-            public void onPageSelected(int i) {
-                currBannerIndex = i;
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int i) {
-                if (i == 0) {
-                    bannerHandler.sendEmptyMessageDelayed(2, 2500);
+                @Override
+                public void onPageSelected(int i) {
+                    currBannerIndex = i;
                 }
-            }
-        });
+
+                @Override
+                public void onPageScrollStateChanged(int i) {
+                    if (i == 0) {
+                        bannerHandler.sendEmptyMessageDelayed(2, 2500);
+                    }
+                }
+            });
+        }
     }
 
     @Override

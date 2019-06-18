@@ -4,7 +4,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.huiketong.guanjiatong"
-        minSdkVersion 16
+        minSdkVersion 17
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -16,8 +16,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    defaultConfig {
+        ndk {
+            abiFilter "armeabi-v7a" //, "armeabi", "x86" 按需设置
+        }
+    }
     sourceSets.main.jniLibs.srcDirs = ['libs']
     sourceSets { main { res.srcDirs = ['src/main/res', 'src/main/res/color'] } }
+
 }
 
 dependencies {
@@ -70,4 +76,8 @@ dependencies {
     annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:3.1.0'
     implementation files('libs/TencentMapSDK_Raster_v_1.3.2.jar')
     implementation files('libs/TencentLocationSdk_v7.1.4.3_r4aa8ac63_20180911_165428.jar')
+
+    implementation 'com.kongzue.dialog:dialog:2.5.1'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support:design:28.0.0'
 }

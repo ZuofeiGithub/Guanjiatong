@@ -16,11 +16,13 @@
         <item name="textPadding">@dimen/dp_5</item>
         <item name="android:text">加载中，请稍候</item>
     </style>
+
     <style name="LoadingTextView_Percent" parent="LoadingTextView">
         <item name="textPadding">@dimen/dp_10</item>
         <item name="textSize">@dimen/sp_15</item>
-        <item name="android:text"/>
+        <item name="android:text" />
     </style>
+
     <style name="TitleBar_Dark">
         <item name="textColor">@android:color/white</item>
         <item name="background">@color/dark_bg_70p</item>
@@ -111,9 +113,16 @@
         <item name="android:textColorHint">@color/inputLabel</item>
         <item name="android:textSize">@dimen/sp_12</item>
     </style>
+
     <style name="popwindowUpAnim">
         <item name="android:windowEnterAnimation">@anim/fade_up</item>
         <item name="android:windowExitAnimation">@anim/fade_down</item>
     </style>
+
+    <style name="Theme.ched" parent="android:style/Theme.Light">   
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
 
 </resources>

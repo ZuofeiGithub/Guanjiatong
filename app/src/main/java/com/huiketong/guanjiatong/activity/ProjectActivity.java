@@ -349,6 +349,7 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
                         break;
                     case "c4e67adb-183a-41b8-a0e4-6c93ef88b388":    //TODO 每日签到
                         intent = new Intent(ProjectActivity.this,SignInActivity.class);
+                        intent.putExtra("projectcode",projectcode);
                         break;
                     case "4f0006a7-5a6d-4024-93ec-8ddcb8682ae6":    //TODO 设计档案
 
