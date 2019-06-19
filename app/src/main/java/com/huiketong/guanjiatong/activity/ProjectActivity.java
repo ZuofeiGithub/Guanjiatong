@@ -434,7 +434,6 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
     private class GetDDNSDeviceListInfoListTask extends AsyncTask<Void, Void, List<EZDeviceInfo>> {
         private boolean mHeaderOrFooter;
         private int mErrorCode = 0;
-        private OnDataFinishedListener onDataFinishedListener;
 
         public GetDDNSDeviceListInfoListTask(boolean headerOrFooter) {
             mHeaderOrFooter = headerOrFooter;
@@ -465,6 +464,13 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
                         if (result.size() > 0) {
                             for (EZDeviceInfo info : result) {
                                 deviceInfoList.add(info);
+                            }
+                        }
+                        if(deviceInfoList.size() > 0){
+                            for (EZDeviceInfo info : deviceInfoList) {
+                                if (deviceInfo.getDeviceSerial().equals(info.getDeviceSerial())) {
+                                    deviceInfo = info;
+                                }
                             }
                         }
                         return result;

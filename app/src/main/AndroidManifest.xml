@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.huiketong.guanjiatong">
-
     <!-- 通过GPS得到精确位置 -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <!-- 通过网络得到粗略位置 -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <!-- 访问网络，某些位置信息需要从网络服务器获取 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- 通过网络得到粗略位置 -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- 访问网络，某些位置信息需要从网络服务器获取 -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -53,7 +50,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.SignInActivity" ></activity>
+        <activity android:name=".activity.SiginHistoryActivity"></activity>
+        <activity android:name=".activity.SignInActivity" />
         <activity android:name=".activity.LaunchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -76,9 +74,10 @@
             android:name=".activity.SiteLiveActivity"
             android:label="工地直播"
             android:launchMode="singleTask" />
+
         <meta-data
             android:name="TencentMapSDK"
-            android:value="P6DBZ-PYJ6S-7SMO4-6YSGV-EV6W6-37BSV"/>
+            android:value="P6DBZ-PYJ6S-7SMO4-6YSGV-EV6W6-37BSV" />
     </application>
 
 </manifest>

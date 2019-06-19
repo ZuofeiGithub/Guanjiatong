@@ -14,8 +14,8 @@
         android:layout_marginEnd="0dp"
         app:layout_constraintBottom_toTopOf="@+id/mapview"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-       />
+        app:layout_constraintStart_toStartOf="parent" />
+
     <com.tencent.tencentmap.mapsdk.map.MapView
         android:id="@+id/mapview"
         android:layout_width="fill_parent"
@@ -50,6 +50,7 @@
             android:src="@drawable/timebk" />
 
         <TextView
+            android:id="@+id/signTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -61,7 +62,7 @@
             android:gravity="center"
             android:text="签到"
             android:textColor="@color/white"
-            android:textSize="@dimen/dp_40" />
+            android:textSize="@dimen/dp_30" />
 
         <TextClock
             android:layout_width="wrap_content"
@@ -98,4 +99,20 @@
             android:textAlignment="center" />
     </RelativeLayout>
 
+    <Button
+        android:id="@+id/checkHistoryBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:drawableLeft="@drawable/find"
+        android:background="@drawable/shape_circle_btn"
+        android:text="查看签到历史"
+        android:gravity="center"
+        android:textColor="#8a8a8a"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
 </android.support.constraint.ConstraintLayout>

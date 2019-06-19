@@ -11,9 +11,11 @@ public class UrlUtils {
     public static String apiUrl = baseUrl + "/api/service/";
 
     //萤石云后台接口地址
-    public static String cameraUrl = "https://gjt.jkt365.com/api/";
+    public static String APIUrl = "https://gjt.jkt365.com/api/";
     //获取直播地址
-    public static String LiveAddress = cameraUrl + "get_device_live_address";
+    public static String LiveAddress = APIUrl + "get_device_live_address";
+    //获取token
+    public static String GetToken = APIUrl+"getToken";
     /**
      * 登录模块
      */

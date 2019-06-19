@@ -4,6 +4,9 @@ import android.app.Application;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.huiketong.guanjiatong.utils.HttpCallback;
+import com.huiketong.guanjiatong.utils.HttpUtils;
+import com.huiketong.guanjiatong.utils.UrlUtils;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
 import com.tencent.bugly.crashreport.CrashReport;
@@ -15,6 +18,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+import okhttp3.Request;
+
 public class MainApplication extends Application {
     //是否是调试模式
     private boolean isDebug = true;
@@ -24,6 +29,7 @@ public class MainApplication extends Application {
 
     private final static int TYPE = TYPE_OPENSDK;
     public static String AppKey = "9e53b2561f314f00ba68b5d58d66e4c0";
+    public static String ACCESS_TOKEN = null;
     public static String API_URL;
     public static String WEB_URL;
     public static String APP_SECRETE;
@@ -127,10 +133,26 @@ public class MainApplication extends Application {
              */
             EZOpenSDK.initLib(this, AppKey);
 
+            HttpUtils.getRequest(UrlUtils.GetToken, null, new HttpCallback() {
+                @Override
+                public void requestSuccess(String result) throws Exception {
+                    ACCESS_TOKEN = result;
+                    EZOpenSDK.getInstance().setAccessToken(ACCESS_TOKEN);
+                }
 
+                @Override
+                public void requestFaild(Request request, IOException io) {
+
+                }
+
+                @Override
+                public void complete() {
+
+                }
+            });
             //EZOpenSDK.initLib(this, "fecf30f4a8754e8bbe4fbcfab2011802");
             //
-            EZOpenSDK.getInstance().setAccessToken("at.atg78tf04q3nva425wf1dlyla80ond1m-1738b6jt2e-1i9afqv-1rivzqgfv");
+
         }
 
     }

@@ -10,17 +10,22 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ezviz.stream.LogUtil;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.huiketong.guanjiatong.R;
 import com.huiketong.guanjiatong.utils.HttpCallback;
 import com.huiketong.guanjiatong.utils.HttpUtils;
 import com.huiketong.guanjiatong.utils.UrlUtils;
 import com.huiketong.guanjiatong.utils.Utils;
 import com.kongzue.dialog.v2.SelectDialog;
+import com.orhanobut.logger.Logger;
 import com.tencent.map.geolocation.TencentLocation;
 import com.tencent.map.geolocation.TencentLocationListener;
 import com.tencent.map.geolocation.TencentLocationManager;
@@ -33,9 +38,10 @@ import com.tencent.tencentmap.mapsdk.map.MapView;
 import com.tencent.tencentmap.mapsdk.map.TencentMap;
 import com.videogo.widget.TitleBar;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -53,6 +59,10 @@ public class SignInActivity extends AppCompatActivity implements TencentLocation
     ImageView siginView;
     @BindView(R.id.currentAddress)
     TextView currentAddressView;
+    @BindView(R.id.signTextView)
+    TextView signTextView;
+    @BindView(R.id.checkHistoryBtn)
+    Button checkHistoryBtn;
     MapView mapView = null;
     TencentMap tencentMap = null;
     private double mLatitude = 0d;
@@ -82,15 +92,14 @@ public class SignInActivity extends AppCompatActivity implements TencentLocation
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
             };
 
-            if (checkSelfPermission(permissions[0]) != PackageManager.PERMISSION_GRANTED)
-            {
+            if (checkSelfPermission(permissions[0]) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(permissions, 0);
             }
         }
         initTencentLocationRequest();
     }
 
-    void initData(){
+    void initData() {
         mPortraitTitleBar.setTitle("每日签到");
 
         siginView.setOnClickListener(new View.OnClickListener() {
@@ -101,10 +110,14 @@ public class SignInActivity extends AppCompatActivity implements TencentLocation
                     public void onClick(DialogInterface dialog, int which) {
                         //Toast.makeText(SignInActivity.this, "您点击了确定按钮", Toast.LENGTH_SHORT).show();
 
-                        String usercode = Utils.getShared(SignInActivity.this,"usercode","").toString();
+                        String usercode = Utils.getShared(SignInActivity.this, "usercode", "").toString();
                         Intent intent = SignInActivity.this.getIntent();
                         String projectcode = intent.getStringExtra("projectcode");
-                        signIn(usercode,""+mLatitude+","+mLongitude,mAddress,projectcode);
+                        try {
+                            signIn(usercode, "" + mLatitude + "," + mLongitude, mAddress, projectcode);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }, "取消", new DialogInterface.OnClickListener() {
                     @Override
@@ -114,19 +127,37 @@ public class SignInActivity extends AppCompatActivity implements TencentLocation
                 });
             }
         });
+
+        checkHistoryBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               Intent intent = new Intent(SignInActivity.this,SiginHistoryActivity.class);
+               intent.putExtra("projectcode",SignInActivity.this.getIntent().getStringExtra("projectcode"));
+               startActivity(intent);
+            }
+        });
     }
 
 
-    void signIn(String usercode,String gps,String signinaddress,String projectcode){
-        Map<String,String> map = new HashMap<>();
-        map.put("usercode",usercode);
-        map.put("gps",gps);
-        map.put("signinaddress",signinaddress);
-        map.put("projectcode",projectcode);
-        HttpUtils.postFormRequest(UrlUtils.SignIn, map, new HttpCallback() {
+    void signIn(String usercode, String gps, String signinaddress, String projectcode) throws JSONException {
+        JsonObject map = new JsonObject();
+        map.addProperty("usercode", usercode);
+        map.addProperty("gps", gps);
+        map.addProperty("signinaddress", signinaddress);
+        map.addProperty("projectcode", projectcode);
+        HttpUtils.postJsonRequest(UrlUtils.SignIn, map, new HttpCallback() {
             @Override
             public void requestSuccess(String result) throws Exception {
-                LogUtil.d("zuofei",result);
+                result = HttpUtils.getJson(result);
+                Logger.d(result);
+                JsonObject object = new JsonParser().parse(result).getAsJsonObject();
+                if (object.get("retStatus").getAsInt() == 100) {
+                    signTextView.setText("签到成功");
+                    Toast.makeText(SignInActivity.this,"签到成功",Toast.LENGTH_SHORT).show();
+                    signTextView.setTextSize(30);
+                }else{
+                    signTextView.setText("签到失败");
+                }
             }
 
             @Override
@@ -194,19 +225,19 @@ public class SignInActivity extends AppCompatActivity implements TencentLocation
             mLatitude = tencentLocation.getLatitude();
             mLongitude = tencentLocation.getLongitude();
             mAddress = tencentLocation.getAddress();
-            tencentMap.setCenter(new LatLng(tencentLocation.getLatitude(),tencentLocation.getLongitude()));
+            tencentMap.setCenter(new LatLng(tencentLocation.getLatitude(), tencentLocation.getLongitude()));
             Marker marker = tencentMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(tencentLocation.getLatitude(),tencentLocation.getLongitude()))
+                    .position(new LatLng(tencentLocation.getLatitude(), tencentLocation.getLongitude()))
                     .anchor(0.5f, 0.5f)
                     .icon(BitmapDescriptorFactory
                             .defaultMarker())
                     .draggable(true));
             marker.showInfoWindow();// 设置默认显示一个infoWindow
-            currentAddressView.setText("当前位置:"+tencentLocation.getAddress());
-            Log.i("zuofei","定位成功");
+            currentAddressView.setText("当前位置:" + tencentLocation.getAddress());
+            Log.i("zuofei", "定位成功");
         } else {
             // 定位失败
-            Log.i("zuofei","定位失败");
+            Log.i("zuofei", "定位失败");
         }
 
     }
@@ -217,14 +248,14 @@ public class SignInActivity extends AppCompatActivity implements TencentLocation
         TencentLocationManager locationManager = TencentLocationManager.getInstance(this);
         int error = locationManager.requestLocationUpdates(request, this);
         if (error == 0)
-            Log.i("zuofei","注册位置监听器成功！");
+            Log.i("zuofei", "注册位置监听器成功！");
         else
-            Log.i("zuofei","注册位置监听器失败！");
+            Log.i("zuofei", "注册位置监听器失败！");
     }
 
     @Override
     public void onStatusUpdate(String s, int i, String s1) {
-        Log.i("zuofei",s);
+        Log.i("zuofei", s);
     }
 
 }

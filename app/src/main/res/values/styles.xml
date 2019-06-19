@@ -124,5 +124,9 @@
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
+    <style name="Button.No.Shader" parent="@style/Widget.AppCompat.Button.Borderless">
+
+    </style>
+
 
 </resources>
