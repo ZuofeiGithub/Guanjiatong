@@ -1,6 +1,5 @@
 package com.huiketong.guanjiatong.activity;
 
-import android.app.ActionBar;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;

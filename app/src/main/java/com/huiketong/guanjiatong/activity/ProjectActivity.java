@@ -116,7 +116,7 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
             "872e9cb2-cbbf-4c68-9786-6167b1709a83", //我的收入
             "92b1259f-1b4c-48ea-8bd7-c822c71167dc", //申请延期
             "2cbad1a3-7ea5-408c-9321-20fac2e029d4", //延期审核
-              "65582869dece4dad8f1ce280be867467",     //工地直播
+            "65582869dece4dad8f1ce280be867467",     //工地直播
             "da41230e-b26f-4e63-907b-63f2b28a279c", //处罚
     };
 
@@ -145,7 +145,6 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
         }
         initView();
         initData();
-
 
 
     }
@@ -182,7 +181,7 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
         // 获取功能列表
         getPresenter().getModule(userCode);
         //获得精选案例列表
-        getPresenter().getCaseList(projectcode,userCode,1,100);
+        getPresenter().getCaseList(projectcode, userCode, 1, 100);
         //获取设备信息
         getPresenter().getDeviceInfo(projectcode);
         getDDNSDeviceListInfoList(true);
@@ -199,12 +198,14 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
         private AppInfo(String key) {
             USER_KEY = key;
         }
+
         public static AppInfo getAppInfo(String key) {
             if (appInfo == null) {
                 appInfo = new AppInfo(key);
             }
             return appInfo;
         }
+
         public static String getAppkey() {
             return appInfo.USER_KEY;
         }
@@ -294,9 +295,9 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
 
     @Override
     public void getCaseInfoSuccess(CaseListBean bean) {
-        Log.i("zuofei",bean.getRows().toString());
-        List<Map<String,Object>> mapList = new ArrayList<>();
-        SimpleAdapter simpleAdapter = new SimpleAdapter(this,mapList,R.layout.select_case_item,new String[]{"","","",""},new int[]{R.id.select_case,1,1,1});
+        Log.i("zuofei", bean.getRows().toString());
+        List<Map<String, Object>> mapList = new ArrayList<>();
+        SimpleAdapter simpleAdapter = new SimpleAdapter(this, mapList, R.layout.select_case_item, new String[]{"", "", "", ""}, new int[]{R.id.select_case, 1, 1, 1});
         mSelectView.setAdapter(simpleAdapter);
     }
 
@@ -348,8 +349,9 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
 
                         break;
                     case "c4e67adb-183a-41b8-a0e4-6c93ef88b388":    //TODO 每日签到
-                        intent = new Intent(ProjectActivity.this,SignInActivity.class);
-                        intent.putExtra("projectcode",projectcode);
+                        intent = new Intent(ProjectActivity.this, SignInActivity.class);
+                        intent.putExtra("projectcode", projectcode);
+                        intent.putExtra("projectname", projectname);
                         break;
                     case "4f0006a7-5a6d-4024-93ec-8ddcb8682ae6":    //TODO 设计档案
 
@@ -385,29 +387,8 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
 
                         break;
                     case "65582869dece4dad8f1ce280be867467":    //工地直播
-
-                        if(deviceInfo != null){
-                            intent = new Intent(ProjectActivity.this,SiteLiveActivity.class);
-                            if (deviceInfo.getCameraNum() <= 0 || deviceInfo.getCameraInfoList() == null || deviceInfo.getCameraInfoList().size() <= 0) {
-                                LogUtil.d("zuofei", "cameralist is null or cameralist size is 0");
-                                return;
-                            }
-                            if (deviceInfo.getCameraNum() == 1 && deviceInfo.getCameraInfoList() != null && deviceInfo.getCameraInfoList().size() == 1) {
-                                LogUtil.d("zuofei", "cameralist have one camera");
-                                final EZCameraInfo cameraInfo = EZUtils.getCameraInfoFromDevice(deviceInfo, 0);
-                                if (cameraInfo == null) {
-                                    return;
-                                }
-                                intent.putExtra("projectname",projectname);
-                                intent.putExtra(IntentConsts.EXTRA_CAMERA_INFO, cameraInfo);
-                                intent.putExtra(IntentConsts.EXTRA_DEVICE_INFO, deviceInfo);
-                            }
-                            code_result = 300;
-                        }else{
-                            com.videogo.util.Utils.showToast(ProjectActivity.this, "该项目没有视频直播");
-                            return;
-                        }
-
+                        intent = siteLive();
+                        if (intent == null) return;
                         break;
                     case "da41230e-b26f-4e63-907b-63f2b28a279c":    //TODO 处罚
 
@@ -419,6 +400,37 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
             }
         });
         tools.setAdapter(adapter);
+    }
+
+    /**
+     * 工地直播
+     *
+     * @return
+     */
+    private Intent siteLive() {
+        Intent intent;
+        if (deviceInfo != null) {
+            intent = new Intent(ProjectActivity.this, SiteLiveActivity.class);
+            if (deviceInfo.getCameraNum() <= 0 || deviceInfo.getCameraInfoList() == null || deviceInfo.getCameraInfoList().size() <= 0) {
+                LogUtil.d("zuofei", "cameralist is null or cameralist size is 0");
+                return null;
+            }
+            if (deviceInfo.getCameraNum() == 1 && deviceInfo.getCameraInfoList() != null && deviceInfo.getCameraInfoList().size() == 1) {
+                LogUtil.d("zuofei", "cameralist have one camera");
+                final EZCameraInfo cameraInfo = EZUtils.getCameraInfoFromDevice(deviceInfo, 0);
+                if (cameraInfo == null) {
+                    return null;
+                }
+                intent.putExtra("projectname", projectname);
+                intent.putExtra(IntentConsts.EXTRA_CAMERA_INFO, cameraInfo);
+                intent.putExtra(IntentConsts.EXTRA_DEVICE_INFO, deviceInfo);
+            }
+            code_result = 300;
+        } else {
+            com.videogo.util.Utils.showToast(ProjectActivity.this, "该项目没有视频直播");
+            return null;
+        }
+        return intent;
     }
 
     private void getDDNSDeviceListInfoList(boolean headerOrFooter) {
@@ -466,7 +478,7 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
                                 deviceInfoList.add(info);
                             }
                         }
-                        if(deviceInfoList.size() > 0){
+                        if (deviceInfoList.size() > 0) {
                             for (EZDeviceInfo info : deviceInfoList) {
                                 if (deviceInfo.getDeviceSerial().equals(info.getDeviceSerial())) {
                                     deviceInfo = info;

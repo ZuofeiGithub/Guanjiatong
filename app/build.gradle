@@ -52,6 +52,7 @@ dependencies {
     implementation 'com.contrarywind:Android-PickerView:4.1.8'
     //下拉刷新,上拉加载
     implementation 'com.lcodecorex:tkrefreshlayout:1.0.7'
+    implementation 'com.yysauce:easyrecyclerview:1.0.0'
     // 运行权限
     implementation 'pub.devrel:easypermissions:2.0.1'
     // json转义处理

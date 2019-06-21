@@ -6,5 +6,6 @@ import com.huiketong.guanjiatong.base.BaseModel;
  * 用户模块
  */
 public class UserModel extends BaseModel {
+    //签到
 
 }

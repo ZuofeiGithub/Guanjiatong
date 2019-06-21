@@ -1,75 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:orientation="vertical"
+    android:layout_height="@dimen/dp_150">
 
     <TextView
         android:id="@+id/projectName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="15dp"
         android:text="沙家圩"
         android:textColor="#000"
         android:textSize="@dimen/dp_18"
-        app:layout_constraintBottom_toTopOf="@+id/button2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+        android:padding="@dimen/dp_5" />
     <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="301dp"
-        android:layout_height="69dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="@dimen/dp_4"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.033">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="279dp"
+            android:layout_height="105dp"
+            android:padding="@dimen/dp_5"
+            android:orientation="vertical"
+            tools:layout_editor_absoluteX="19dp"
+            tools:layout_editor_absoluteY="154dp">
 
-        <TextView
-            android:id="@+id/userName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="签到用户:曹俊" />
+            <TextView
+                android:id="@+id/userName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="签到用户:曹俊" />
 
-        <TextView
-            android:id="@+id/address"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="签到地点:江苏省南通市崇川区通甲路6号" />
+            <TextView
+                android:id="@+id/address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="签到地点:江苏省南通市崇川区通甲路6号" />
 
-        <TextView
-            android:id="@+id/siginTime"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="签到时间:2019-06-19 09:34:23" />
+            <TextView
+                android:id="@+id/siginTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="签到时间:2019-06-19 09:34:23" />
+        </LinearLayout>
+        <Button
+            android:id="@+id/button2"
+            android:gravity="center"
+            android:layout_gravity="center"
+            style="@style/Button.No.Shader"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/dp_30"
+            android:background="@drawable/shape_circle_signin_history_btn"
+            android:enabled="false"
+            android:text="签到成功"
+            android:textColor="#000"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/button2"
-        style="@style/Button.No.Shader"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginStart="316dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="652dp"
-        android:background="@drawable/shape_circle_signin_history_btn"
-        android:enabled="false"
-        android:text="签到成功"
-        android:textColor="#000"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/linearLayout" />
-</android.support.constraint.ConstraintLayout>
+
+
+</LinearLayout>

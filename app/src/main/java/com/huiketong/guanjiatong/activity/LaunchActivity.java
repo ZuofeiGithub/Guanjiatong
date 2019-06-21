@@ -6,9 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 
-import com.huiketong.guanjiatong.utils.HttpUtils;
 import com.huiketong.guanjiatong.utils.Utils;
-import com.videogo.openapi.EZOpenSDK;
 
 /**
  * 启动初始化

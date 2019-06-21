@@ -10,7 +10,6 @@ import com.huiketong.guanjiatong.R;
 import com.huiketong.guanjiatong.base.BaseActivity;
 import com.huiketong.guanjiatong.presenter.LoginPresenter;
 import com.huiketong.guanjiatong.view.LoginView;
-import com.orhanobut.logger.Logger;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

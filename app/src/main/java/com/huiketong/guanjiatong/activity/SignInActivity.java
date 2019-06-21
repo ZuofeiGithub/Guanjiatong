@@ -15,8 +15,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ezviz.stream.LogUtil;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.huiketong.guanjiatong.R;
@@ -39,7 +37,6 @@ import com.tencent.tencentmap.mapsdk.map.TencentMap;
 import com.videogo.widget.TitleBar;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -133,6 +130,7 @@ public class SignInActivity extends AppCompatActivity implements TencentLocation
             public void onClick(View v) {
                Intent intent = new Intent(SignInActivity.this,SiginHistoryActivity.class);
                intent.putExtra("projectcode",SignInActivity.this.getIntent().getStringExtra("projectcode"));
+               intent.putExtra("projectname",SignInActivity.this.getIntent().getStringExtra("projectname"));
                startActivity(intent);
             }
         });
