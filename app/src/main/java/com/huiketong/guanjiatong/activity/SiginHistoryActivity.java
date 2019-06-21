@@ -12,6 +12,7 @@ import com.huiketong.guanjiatong.bean.SigninBean;
 import com.huiketong.guanjiatong.myview.SiginHistoryRecycleView;
 import com.huiketong.guanjiatong.utils.HttpCallback;
 import com.huiketong.guanjiatong.utils.HttpUtils;
+import com.huiketong.guanjiatong.utils.ProgressDialog;
 import com.huiketong.guanjiatong.utils.UrlUtils;
 import com.huiketong.guanjiatong.utils.Utils;
 import com.zly.www.easyrecyclerview.listener.OnLoadListener;
@@ -68,6 +69,7 @@ public class SiginHistoryActivity extends AppCompatActivity implements OnLoadLis
         map.put("projectcode",projectCode);
         map.put("p",String.valueOf(p));
         map.put("ps",String.valueOf(ps));
+        ProgressDialog.getInstance().showDialog(this,"正在加载");
         HttpUtils.getRequest(UrlUtils.GetSignIn, map, new HttpCallback() {
             @Override
             public void requestSuccess(String result) throws Exception {
@@ -93,7 +95,7 @@ public class SiginHistoryActivity extends AppCompatActivity implements OnLoadLis
 
             @Override
             public void complete() {
-
+                ProgressDialog.getInstance().closeDialog();
             }
         });
     }

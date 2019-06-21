@@ -11,7 +11,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.huiketong.guanjiatong.R;
+import com.huiketong.guanjiatong.activity.AboutUsActivity;
+import com.huiketong.guanjiatong.activity.ActivitiesActivity;
 import com.huiketong.guanjiatong.activity.LoginActivity;
+import com.huiketong.guanjiatong.activity.SystemMsgActivity;
 import com.huiketong.guanjiatong.base.BaseFragment;
 import com.huiketong.guanjiatong.myview.RoundCornerImageView;
 import com.huiketong.guanjiatong.presenter.MyPresenter;
@@ -74,10 +77,13 @@ public class MyFragment extends BaseFragment<MyView, MyPresenter> implements MyV
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_new_activity:
+                startActivity(new Intent(getActivity(), ActivitiesActivity.class));
                 break;
             case R.id.btn_sys_message:
+                startActivity(new Intent(getActivity(),SystemMsgActivity.class));
                 break;
             case R.id.btn_about:
+                startActivity(new Intent(getActivity(), AboutUsActivity.class));
                 break;
             case R.id.btn_logout:   //退出登录
                 Utils.clearShare(getContext());
@@ -86,4 +92,5 @@ public class MyFragment extends BaseFragment<MyView, MyPresenter> implements MyV
                 break;
         }
     }
+
 }

@@ -1,5 +1,6 @@
 package com.huiketong.guanjiatong.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import com.bigkoo.pickerview.listener.OnOptionsSelectListener;
 import com.bigkoo.pickerview.view.OptionsPickerView;
 import com.huiketong.guanjiatong.R;
+import com.huiketong.guanjiatong.activity.CommissionRulesActivity;
 import com.huiketong.guanjiatong.base.BaseFragment;
 import com.huiketong.guanjiatong.presenter.ClientPresenter;
 import com.huiketong.guanjiatong.utils.Utils;
@@ -137,7 +139,7 @@ public class ClientFragment extends BaseFragment<ClientView, ClientPresenter> im
                 getPresenter().addPotential(usercode, companycode, name, phone, address, style, scheme, area, budget, remark);
                 break;
             case R.id.btn_rule: // TODO 佣金规则
-
+                startActivity(new Intent(getActivity(), CommissionRulesActivity.class));
                 break;
         }
     }

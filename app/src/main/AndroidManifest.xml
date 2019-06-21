@@ -50,7 +50,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.SiginHistoryActivity"></activity>
+        <activity android:name=".activity.CommissionRulesActivity"></activity>
+        <activity android:name=".activity.AboutUsActivity" />
+        <activity android:name=".activity.ActivitiesActivity" />
+        <activity android:name=".activity.SystemMsgActivity" />
+        <activity android:name=".activity.SiginHistoryActivity" />
         <activity android:name=".activity.SignInActivity" />
         <activity android:name=".activity.LaunchActivity">
             <intent-filter>
