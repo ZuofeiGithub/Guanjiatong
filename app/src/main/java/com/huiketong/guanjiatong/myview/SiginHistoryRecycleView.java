@@ -7,9 +7,11 @@ import android.view.View;
 
 import com.zly.www.easyrecyclerview.EasyRecyclerView;
 import com.zly.www.easyrecyclerview.footer.ErvDefaultFooter;
+import com.zly.www.easyrecyclerview.footer.ErvLoadUIHandle;
+import com.zly.www.easyrecyclerview.listener.OnLoadListener;
 import com.zly.www.easyrecyclerview.ptrlib.PtrClassicDefaultHeader;
 
-public class SiginHistoryRecycleView extends EasyRecyclerView {
+public class SiginHistoryRecycleView extends EasyRecyclerView implements ErvLoadUIHandle {
 
     private PtrClassicDefaultHeader mPtrClassicHeader;
     public SiginHistoryRecycleView(Context context) {
@@ -52,4 +54,23 @@ public class SiginHistoryRecycleView extends EasyRecyclerView {
     }
 
 
+    @Override
+    public int getState() {
+        return 0;
+    }
+
+    @Override
+    public void onLoading() {
+
+    }
+
+    @Override
+    public void onNoMore() {
+
+    }
+
+    @Override
+    public void onLoadFail(OnLoadListener listener) {
+
+    }
 }

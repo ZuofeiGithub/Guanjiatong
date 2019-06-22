@@ -21,6 +21,7 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
@@ -232,12 +233,14 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
     TextView mRealPlayFullFlowTv;
     @BindView(R.id.realplay_capture_iv)
     ImageView mRealPlayCaptureIv;
-    @BindView(R.id.title_bar_portrait)
-    TitleBar mPortraitTitleBar;
     @BindView(R.id.title_bar_landscape)
     TitleBar mLandscapeTitleBar;
     @BindView(R.id.realplay_page_anim_iv)
     ImageView mPageAnimIv;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.tb_title)
+    TextView tbTitle;
 
     private long mStreamFlow = 0;
     private Rect mRealPlayRect = null;
@@ -356,6 +359,7 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
         if (mDeviceInfo != null && mDeviceInfo.getIsEncrypt() == 1) {
             mVerifyCode = DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial());
         }
+        setToolBar(toolbar, tbTitle, getIntent().getStringExtra("projectname") + getIntent().getStringExtra("housenumber"));
     }
     // 得到播放器的信息
     private void getRealPlaySquareInfo() {
@@ -537,19 +541,19 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
     // 初始化标题栏
     private void initTitleBar() {
         // 返回事件
-        mPortraitTitleBar.addBackButton(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                closePtzPopupWindow();
-                closeTalkPopupWindow(true, false);
-                if (mStatus != RealPlayStatus.STATUS_STOP) {
-                    stopRealPlay();
-                    setRealPlayStopUI();
-                }
-                finish();
-            }
-        });
+//        mPortraitTitleBar.addBackButton(new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View v) {
+//                closePtzPopupWindow();
+//                closeTalkPopupWindow(true, false);
+//                if (mStatus != RealPlayStatus.STATUS_STOP) {
+//                    stopRealPlay();
+//                    setRealPlayStopUI();
+//                }
+//                finish();
+//            }
+//        });
         if (mRtspUrl == null) {
         } else {
             //mPortraitTitleBar.setBackgroundColor(getResources().getColor(R.color.black_bg));
@@ -2177,7 +2181,7 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
         mRealPlaySoundBtn.setVisibility(View.VISIBLE);
         if (mCameraInfo != null) {
             //mPortraitTitleBar.setTitle(mCameraInfo.getCameraName());
-            mPortraitTitleBar.setTitle(mProjectName);
+            //mPortraitTitleBar.setTitle(mProjectName);
             //mLandscapeTitleBar.setTitle(mCameraInfo.getCameraName());
             mLandscapeTitleBar.setTitle(mProjectName);
             setCameraInfoTiletRightBtn();
@@ -2199,7 +2203,7 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
             updateUI();
         } else if (mRtspUrl != null) {
             if (!TextUtils.isEmpty(mRealPlaySquareInfo.mCameraName)) {
-                mPortraitTitleBar.setTitle(mRealPlaySquareInfo.mCameraName);
+                //mPortraitTitleBar.setTitle(mRealPlaySquareInfo.mCameraName);
                 mLandscapeTitleBar.setTitle(mRealPlaySquareInfo.mCameraName);
             }
             mRealPlaySoundBtn.setVisibility(View.GONE);
@@ -2215,7 +2219,7 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
             fullScreen(false);
             updateOrientation();
-            mPortraitTitleBar.setVisibility(View.VISIBLE);
+            //mPortraitTitleBar.setVisibility(View.VISIBLE);
             mLandscapeTitleBar.setVisibility(View.GONE);
             mRealPlayControlRl.setVisibility(View.VISIBLE);
             if (mRtspUrl == null) {
@@ -2233,7 +2237,7 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
             }
         } else {
             fullScreen(true);
-            mPortraitTitleBar.setVisibility(View.GONE);
+            //mPortraitTitleBar.setVisibility(View.GONE);
             // hide the
             mRealPlayControlRl.setVisibility(View.GONE);
             if (!mIsOnTalk && !mIsOnPtz) {
@@ -2331,7 +2335,7 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
         ImageButton ptzFlipBtn = (ImageButton) layoutView.findViewById(R.id.ptz_flip_btn);
         ptzFlipBtn.setOnClickListener(mOnPopWndClickListener);
 
-        int height = mLocalInfo.getScreenHeight() - mPortraitTitleBar.getHeight() - mRealPlayPlayRl.getHeight()
+        int height = mLocalInfo.getScreenHeight() - toolbar.getHeight() - mRealPlayPlayRl.getHeight()
                 - (mRealPlayRect != null ? mRealPlayRect.top : mLocalInfo.getNavigationBarHeight());
         mPtzPopupWindow = new PopupWindow(layoutView, RelativeLayout.LayoutParams.MATCH_PARENT, height, true);
         mPtzPopupWindow.setBackgroundDrawable(new BitmapDrawable());
@@ -2999,7 +3003,7 @@ public class SiteLiveActivity extends BaseActivity<SiteLiveView, SiteLivePresent
             mTalkBackControlBtn.setText(R.string.talking);
         }
 
-        int height = mLocalInfo.getScreenHeight() - mPortraitTitleBar.getHeight() - mRealPlayPlayRl.getHeight()
+        int height = mLocalInfo.getScreenHeight() - toolbar.getHeight() - mRealPlayPlayRl.getHeight()
                 - (mRealPlayRect != null ? mRealPlayRect.top : mLocalInfo.getNavigationBarHeight());
         mTalkPopupWindow = new PopupWindow(layoutView, RelativeLayout.LayoutParams.MATCH_PARENT, height, true);
         if (showAnimation) {

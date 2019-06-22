@@ -143,6 +143,7 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
             Utils.Toast(this, "请选择工地项目");
             finish();
         }
+        getDDNSDeviceListInfoList(true);
         initView();
         initData();
 
@@ -184,7 +185,6 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
         getPresenter().getCaseList(projectcode, userCode, 1, 100);
         //获取设备信息
         getPresenter().getDeviceInfo(projectcode);
-        getDDNSDeviceListInfoList(true);
         deviceInfoList = new ArrayList<>();
         Utility.setListViewHeightBasedOnChildren(mSelectView);
     }
@@ -286,6 +286,7 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
     @Override
     public void getDeviceInfoSuccess(EZDeviceInfo bean) {
         deviceInfo = bean;
+        getDDNSDeviceListInfoList(true);
         for (EZDeviceInfo info : deviceInfoList) {
             if (deviceInfo.getDeviceSerial().equals(info.getDeviceSerial())) {
                 deviceInfo = info;
@@ -422,6 +423,7 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
                     return null;
                 }
                 intent.putExtra("projectname", projectname);
+                intent.putExtra("housenumber",housenumber);
                 intent.putExtra(IntentConsts.EXTRA_CAMERA_INFO, cameraInfo);
                 intent.putExtra(IntentConsts.EXTRA_DEVICE_INFO, deviceInfo);
             }
@@ -464,6 +466,9 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
             }
             if (!ConnectionDetector.isNetworkAvailable(ProjectActivity.this)) {
                 mErrorCode = ErrorCode.ERROR_WEB_NET_EXCEPTION;
+                return null;
+            }
+            if(deviceInfo == null){
                 return null;
             }
 

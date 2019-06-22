@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -18,10 +19,13 @@ import android.widget.Toast;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.huiketong.guanjiatong.R;
+import com.huiketong.guanjiatong.base.BaseActivity;
+import com.huiketong.guanjiatong.presenter.SignInPresenter;
 import com.huiketong.guanjiatong.utils.HttpCallback;
 import com.huiketong.guanjiatong.utils.HttpUtils;
 import com.huiketong.guanjiatong.utils.UrlUtils;
 import com.huiketong.guanjiatong.utils.Utils;
+import com.huiketong.guanjiatong.view.SignInView;
 import com.kongzue.dialog.v2.SelectDialog;
 import com.orhanobut.logger.Logger;
 import com.tencent.map.geolocation.TencentLocation;
@@ -34,7 +38,6 @@ import com.tencent.mapsdk.raster.model.Marker;
 import com.tencent.mapsdk.raster.model.MarkerOptions;
 import com.tencent.tencentmap.mapsdk.map.MapView;
 import com.tencent.tencentmap.mapsdk.map.TencentMap;
-import com.videogo.widget.TitleBar;
 
 import org.json.JSONException;
 
@@ -47,11 +50,13 @@ import okhttp3.Request;
 /**
  * 签到
  */
-public class SignInActivity extends AppCompatActivity implements TencentLocationListener {
+public class SignInActivity extends BaseActivity<SignInView, SignInPresenter> implements SignInView,TencentLocationListener {
 
 
-    @BindView(R.id.title_bar_portrait)
-    TitleBar mPortraitTitleBar;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.tb_title)
+    TextView tbTitle;
     @BindView(R.id.sigin)
     ImageView siginView;
     @BindView(R.id.currentAddress)
@@ -71,7 +76,6 @@ public class SignInActivity extends AppCompatActivity implements TencentLocation
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
         ButterKnife.bind(this);
-        initTitleBar();
         initData();
         mapView = findViewById(R.id.mapview);
         mapView.onCreate(savedInstanceState);
@@ -96,9 +100,18 @@ public class SignInActivity extends AppCompatActivity implements TencentLocation
         initTencentLocationRequest();
     }
 
-    void initData() {
-        mPortraitTitleBar.setTitle("每日签到");
+    @Override
+    protected SignInView createView() {
+        return this;
+    }
 
+    @Override
+    protected SignInPresenter createPresenter() {
+        return new SignInPresenter(this);
+    }
+
+    void initData() {
+        setToolBar(toolbar,tbTitle,"每日签到");
         siginView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -170,17 +183,6 @@ public class SignInActivity extends AppCompatActivity implements TencentLocation
         });
     }
 
-    // 初始化标题栏
-    private void initTitleBar() {
-        // 返回事件
-        mPortraitTitleBar.addBackButton(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-    }
 
     @Override
     protected void onDestroy() {

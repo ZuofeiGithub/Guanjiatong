@@ -3,19 +3,27 @@ package com.huiketong.guanjiatong.activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.huiketong.guanjiatong.R;
 import com.huiketong.guanjiatong.adapter.SiginListAdapter;
+import com.huiketong.guanjiatong.base.BaseActivity;
 import com.huiketong.guanjiatong.bean.SiginListBean;
 import com.huiketong.guanjiatong.bean.SigninBean;
 import com.huiketong.guanjiatong.myview.SiginHistoryRecycleView;
+import com.huiketong.guanjiatong.presenter.SiginHistoryPresenter;
 import com.huiketong.guanjiatong.utils.HttpCallback;
 import com.huiketong.guanjiatong.utils.HttpUtils;
 import com.huiketong.guanjiatong.utils.ProgressDialog;
 import com.huiketong.guanjiatong.utils.UrlUtils;
 import com.huiketong.guanjiatong.utils.Utils;
+import com.huiketong.guanjiatong.view.SiginHistoryView;
+import com.zly.www.easyrecyclerview.footer.ErvLoadUIHandle;
 import com.zly.www.easyrecyclerview.listener.OnLoadListener;
+import com.zly.www.easyrecyclerview.listener.OnRefreshListener;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -28,7 +36,7 @@ import okhttp3.Request;
 /**
  * 签到历史记录
  */
-public class SiginHistoryActivity extends AppCompatActivity implements OnLoadListener {
+public class SiginHistoryActivity extends BaseActivity<SiginHistoryView, SiginHistoryPresenter> implements SiginHistoryView,OnLoadListener, OnRefreshListener{
 
     SiginListAdapter siginListAdapter;
 
@@ -42,6 +50,10 @@ public class SiginHistoryActivity extends AppCompatActivity implements OnLoadLis
 
     @BindView(R.id.erv)
     SiginHistoryRecycleView siginHistoryRecycleView;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.tb_title)
+    TextView tbTitle;
 
     final static Integer COUNTS = 10;
 
@@ -56,10 +68,21 @@ public class SiginHistoryActivity extends AppCompatActivity implements OnLoadLis
         initData();
     }
 
+    @Override
+    protected SiginHistoryView createView() {
+        return this;
+    }
+
+    @Override
+    protected SiginHistoryPresenter createPresenter() {
+        return new SiginHistoryPresenter(this);
+    }
+
     void initData(){
          usercode = Utils.getShared(this, "usercode", "").toString();
          projectCode = this.getIntent().getStringExtra("projectcode");
          projectName = this.getIntent().getStringExtra("projectname");
+         setToolBar(toolbar,tbTitle,"签到历史");
         getSiginHistoryList(usercode,projectCode,page,COUNTS);
     }
 
@@ -85,6 +108,8 @@ public class SiginHistoryActivity extends AppCompatActivity implements OnLoadLis
                        signinBean.setAddress(bean.getSigninaddress());
                        siginListAdapter.add(signinBean);
                    }
+               }else{
+
                }
             }
 
@@ -95,6 +120,7 @@ public class SiginHistoryActivity extends AppCompatActivity implements OnLoadLis
 
             @Override
             public void complete() {
+                siginHistoryRecycleView.removeFooter();
                 ProgressDialog.getInstance().closeDialog();
             }
         });
@@ -102,11 +128,11 @@ public class SiginHistoryActivity extends AppCompatActivity implements OnLoadLis
 
     @Override
     public void onLoadListener() {
-
+        siginHistoryRecycleView.setFooterView(LayoutInflater.from(this).inflate(R.layout.foot_layout,null));
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (siginListAdapter.getItemCount() > mTotalCount) {
+                if (siginListAdapter.getItemCount() >= mTotalCount) {
                     siginHistoryRecycleView.noMore();
                 } else {
                     page++;
@@ -116,8 +142,19 @@ public class SiginHistoryActivity extends AppCompatActivity implements OnLoadLis
         }, 3000);
     }
 
-//    @Override
-//    public void onRefreshListener() {
-//
-//    }
+    @Override
+    public void onRefreshListener() {
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (siginListAdapter.getItemCount() >= mTotalCount) {
+                    siginHistoryRecycleView.noMore();
+                } else {
+                    page++;
+                    getSiginHistoryList(usercode,projectCode,page,COUNTS);
+                }
+            }
+        }, 3000);
+    }
+
 }
