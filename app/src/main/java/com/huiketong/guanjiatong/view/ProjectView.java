@@ -4,6 +4,7 @@ import com.huiketong.guanjiatong.base.BaseView;
 import com.huiketong.guanjiatong.bean.BannerByUserCodeBean;
 import com.huiketong.guanjiatong.bean.CaseListBean;
 import com.huiketong.guanjiatong.bean.ModuleBean;
+import com.huiketong.guanjiatong.bean.ProjectCateBean;
 import com.huiketong.guanjiatong.bean.ProjectInfoBean;
 import com.huiketong.guanjiatong.bean.ProjectTeamUserBean;
 import com.videogo.openapi.bean.EZDeviceInfo;
@@ -44,4 +45,8 @@ public interface ProjectView extends BaseView {
 
 
     void getCaseInfoSuccess(CaseListBean bean);
+
+    void GetProjectCateSuccess(ProjectCateBean bean);
+
+    void GetTaskTemplateSuccess();
 }

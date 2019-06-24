@@ -28,6 +28,24 @@ public class ProjectModel extends BaseModel {
     }
 
     /**
+     * 获得项目状态
+     * @param usercode
+     * @param callback
+     */
+   public void GetProjectCate(String usercode,HttpCallback callback){
+        Map<String,String> params = new HashMap<>();
+        params.put("usercode",usercode);
+        HttpUtils.getRequest(UrlUtils.GetProjectCate,params,callback);
+   }
+
+
+   public void GetTaskTemplate(String companyCode,HttpCallback callback){
+       Map<String,String> params = new HashMap<>();
+       params.put("companyCode",companyCode);
+       HttpUtils.getRequest(UrlUtils.GetTaskTemplate,params,callback);
+   }
+
+    /**
      * 获取项目列表
      *
      * @param usercode

@@ -9,6 +9,7 @@ import com.huiketong.guanjiatong.bean.BannerByUserCodeBean;
 import com.huiketong.guanjiatong.bean.CaseListBean;
 import com.huiketong.guanjiatong.bean.DeviceInfoResp;
 import com.huiketong.guanjiatong.bean.ModuleBean;
+import com.huiketong.guanjiatong.bean.ProjectCateBean;
 import com.huiketong.guanjiatong.bean.ProjectInfoBean;
 import com.huiketong.guanjiatong.bean.ProjectTeamUserBean;
 import com.huiketong.guanjiatong.model.BannerModel;
@@ -19,6 +20,7 @@ import com.huiketong.guanjiatong.utils.HttpCallback;
 import com.huiketong.guanjiatong.utils.HttpUtils;
 import com.huiketong.guanjiatong.utils.Utils;
 import com.huiketong.guanjiatong.view.ProjectView;
+import com.lcodecore.tkrefreshlayout.utils.LogUtil;
 import com.videogo.openapi.bean.EZDeviceInfo;
 
 import java.io.IOException;
@@ -33,6 +35,7 @@ public class ProjectPresenter extends BasePresenter<ProjectView> {
     private ProjectModel projectModel;
     private OtherModel otherModel;
     private DeviceInfoModel deviceInfoModel;
+
     public ProjectPresenter(Context context) {
         this.context = context;
         bannerModel = new BannerModel();
@@ -96,18 +99,64 @@ public class ProjectPresenter extends BasePresenter<ProjectView> {
     }
 
     /**
+     * 获取项目状态
+     * @param usercode
+     */
+    public void getProjectCate(String usercode) {
+        projectModel.GetProjectCate(usercode, new HttpCallback() {
+            @Override
+            public void requestSuccess(String result) throws Exception {
+                result = HttpUtils.getJson(result);
+                ProjectCateBean bean = new Gson().fromJson(result,ProjectCateBean.class);
+                getView().GetProjectCateSuccess(bean);
+            }
+
+            @Override
+            public void requestFaild(Request request, IOException io) {
+
+            }
+
+            @Override
+            public void complete() {
+
+            }
+        });
+    }
+
+    public void getTaskTemplate(String companyCode){
+        projectModel.GetTaskTemplate(companyCode, new HttpCallback() {
+            @Override
+            public void requestSuccess(String result) throws Exception {
+                result = HttpUtils.getJson(result);
+                LogUtil.i(result);
+            }
+
+            @Override
+            public void requestFaild(Request request, IOException io) {
+
+            }
+
+            @Override
+            public void complete() {
+
+            }
+        });
+    }
+
+    /**
      * 获得精选案例列表
+     *
      * @param projectcode
      * @param userCode
      * @param p
      * @param ps
      */
-    public void getCaseList(String projectcode,String userCode,Integer p,Integer ps){
+    public void getCaseList(String projectcode, String userCode, Integer p, Integer ps) {
         projectModel.GetCase(projectcode, userCode, String.valueOf(p), String.valueOf(ps), new HttpCallback() {
             @Override
             public void requestSuccess(String result) throws Exception {
                 result = HttpUtils.getJson(result);
-                CaseListBean bean = new Gson().fromJson(result,CaseListBean.class);
+                CaseListBean bean = new Gson().fromJson(result, CaseListBean.class);
                 getView().getCaseInfoSuccess(bean);
             }
 
@@ -125,14 +174,15 @@ public class ProjectPresenter extends BasePresenter<ProjectView> {
 
     /**
      * 获取设备信息
+     *
      * @param projectcode
      */
-    public void getDeviceInfo(String projectcode){
+    public void getDeviceInfo(String projectcode) {
         deviceInfoModel.getDeviceInfo(projectcode, new HttpCallback() {
             @Override
             public void requestSuccess(String result) throws Exception {
                 result = HttpUtils.getJson(result);
-                DeviceInfoResp deviceInfoResp = new Gson().fromJson(result,DeviceInfoResp.class);
+                DeviceInfoResp deviceInfoResp = new Gson().fromJson(result, DeviceInfoResp.class);
                 EZDeviceInfo ezDeviceInfo = new EZDeviceInfo();
                 ezDeviceInfo.setDeviceName(deviceInfoResp.getData().getDeviceInfo().getDeviceName());
                 ezDeviceInfo.setAddTime(deviceInfoResp.getData().getDeviceInfo().getAddTime());
@@ -159,17 +209,18 @@ public class ProjectPresenter extends BasePresenter<ProjectView> {
 
     /**
      * 获取项目团队列表
+     *
      * @param projectcode 项目code
-     * @param p 第几页
-     * @param ps 取几个
+     * @param p           第几页
+     * @param ps          取几个
      */
     public void getTeamList(String projectcode, int p, int ps) {
         projectModel.GetProjectTeamUser(projectcode, String.valueOf(p), String.valueOf(ps), new HttpCallback() {
             @Override
             public void requestSuccess(String result) throws Exception {
                 result = HttpUtils.getJson(result);
-                if(unifySuccessDispose(result)){
-                    ProjectTeamUserBean bean = new Gson().fromJson(result,ProjectTeamUserBean.class);
+                if (unifySuccessDispose(result)) {
+                    ProjectTeamUserBean bean = new Gson().fromJson(result, ProjectTeamUserBean.class);
                     getView().getTeamList(bean);
                 }
             }
@@ -188,15 +239,16 @@ public class ProjectPresenter extends BasePresenter<ProjectView> {
 
     /**
      * 获取功能模块
+     *
      * @param usercode
      */
-    public void getModule(String usercode){
+    public void getModule(String usercode) {
         otherModel.GetModule(usercode, new HttpCallback() {
             @Override
             public void requestSuccess(String result) throws Exception {
                 result = HttpUtils.getJson(result);
-                if(unifySuccessDispose(result)){
-                    ModuleBean bean = new Gson().fromJson(result,ModuleBean.class);
+                if (unifySuccessDispose(result)) {
+                    ModuleBean bean = new Gson().fromJson(result, ModuleBean.class);
                     getView().getModuleSuccess(bean);
                 }
             }

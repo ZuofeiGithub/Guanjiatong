@@ -30,6 +30,7 @@ import com.huiketong.guanjiatong.base.BaseActivity;
 import com.huiketong.guanjiatong.bean.BannerByUserCodeBean;
 import com.huiketong.guanjiatong.bean.CaseListBean;
 import com.huiketong.guanjiatong.bean.ModuleBean;
+import com.huiketong.guanjiatong.bean.ProjectCateBean;
 import com.huiketong.guanjiatong.bean.ProjectInfoBean;
 import com.huiketong.guanjiatong.bean.ProjectTeamUserBean;
 import com.huiketong.guanjiatong.myview.RoundCornerImageView;
@@ -187,6 +188,10 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
         getPresenter().getDeviceInfo(projectcode);
         deviceInfoList = new ArrayList<>();
         Utility.setListViewHeightBasedOnChildren(mSelectView);
+        //获取项目状态
+        getPresenter().getProjectCate(userCode);
+        //获取项目模板
+        getPresenter().getTaskTemplate((String) Utils.getShared(this,"companycode",""));
     }
 
 
@@ -300,6 +305,16 @@ public class ProjectActivity extends BaseActivity<ProjectView, ProjectPresenter>
         List<Map<String, Object>> mapList = new ArrayList<>();
         SimpleAdapter simpleAdapter = new SimpleAdapter(this, mapList, R.layout.select_case_item, new String[]{"", "", "", ""}, new int[]{R.id.select_case, 1, 1, 1});
         mSelectView.setAdapter(simpleAdapter);
+    }
+
+    @Override
+    public void GetProjectCateSuccess(ProjectCateBean bean) {
+
+    }
+
+    @Override
+    public void GetTaskTemplateSuccess() {
+
     }
 
     @Override
